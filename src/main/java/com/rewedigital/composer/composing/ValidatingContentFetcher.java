@@ -41,7 +41,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
 
         final String expandedPath = UriTemplate.fromTemplate(path).expand(parsedPathArguments);
         return client.send(session.enrich(Request.forUri(expandedPath, "GET")))
-            .thenApply(this::acceptHtmlOnly)
+            .thenApply(response -> acceptHtmlOnly(response, expandedPath))
             .thenApply(r -> toStringPayload(r, fallback))
             .toCompletableFuture();
     }
@@ -51,11 +51,12 @@ public class ValidatingContentFetcher implements ContentFetcher {
         return response.withPayload(value);
     }
 
-    private Response<ByteString> acceptHtmlOnly(final Response<ByteString> response) {
+    private Response<ByteString> acceptHtmlOnly(final Response<ByteString> response, final String expandedPath) {
         final String contentType = response.header("Content-Type").orElse("other");
         if (contentType != null && contentType.contains("text/html")) {
             return response;
         }
+        LOGGER.warn("Content-Type of [{}] is not text/html, returning an empty body.", expandedPath);
         return response.withPayload(null);
     }
 }

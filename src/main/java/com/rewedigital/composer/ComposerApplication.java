@@ -21,20 +21,21 @@ import com.typesafe.config.Config;
 public class ComposerApplication {
 
     public static void main(final String[] args) throws LoadingException {
-
-        final Service service =
-            HttpService
-                .usingAppInit(Initializer::init, "composer")
-                .withModule(HttpClientModule.create())
-                .withModule(ClientDecoratingModule.create(new ErrorClientDecorator()))
-                .build();
-
-        HttpService.boot(service, args);
+        HttpService.boot(bootstrapService(), args);
     }
 
-    private static class Initializer {
+    private static Service bootstrapService() {
+        return HttpService
+            .usingAppInit(Initializer::init, "composer")
+            .withEnvVarPrefix("COMPOSER")
+            .withModule(HttpClientModule.create())
+            .withModule(ClientDecoratingModule.create(new ErrorClientDecorator()))
+            .build();
+    }
 
-        private static void init(final Environment environment) {
+    static class Initializer {
+
+        static void init(final Environment environment) {
             final Config configuration = withDefaults(environment.config());
 
             final ComposingRequestHandler handler =
@@ -45,17 +46,29 @@ public class ComposerApplication {
                         new SessionAwareProxyClient()),
                     new CookieBasedSessionHandler.Factory(configuration.getConfig("composer.session")));
 
+            configureRoutes(environment, handler);
+        }
+
+        private static void configureRoutes(final Environment environment, final ComposingRequestHandler handler) {
             environment.routingEngine()
-                .registerAutoRoute(Route.async("GET", "/", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("GET", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("HEAD", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("POST", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("PUT", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("DELETE", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("TRACE", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("OPTIONS", "/<path:path>", rc -> handler.execute(rc)))
-                .registerAutoRoute(Route.async("PATCH", "/<path:path>", rc -> handler.execute(rc)));
+                .registerAutoRoute(Route.async("GET", "/", handler::execute))
+                .registerAutoRoute(Route.async("HEAD", "/", handler::execute))
+                .registerAutoRoute(Route.async("POST", "/", handler::execute))
+                .registerAutoRoute(Route.async("PUT", "/", handler::execute))
+                .registerAutoRoute(Route.async("DELETE", "/", handler::execute))
+                .registerAutoRoute(Route.async("TRACE", "/", handler::execute))
+                .registerAutoRoute(Route.async("OPTIONS", "/", handler::execute))
+                .registerAutoRoute(Route.async("PATCH", "/", handler::execute))
+                .registerAutoRoute(Route.async("GET", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("HEAD", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("POST", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("PUT", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("DELETE", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("TRACE", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("OPTIONS", "/<path:path>", handler::execute))
+                .registerAutoRoute(Route.async("PATCH", "/<path:path>", handler::execute));
         }
 
     }
+
 }
