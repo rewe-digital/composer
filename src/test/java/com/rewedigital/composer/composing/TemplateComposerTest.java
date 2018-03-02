@@ -15,10 +15,6 @@ import java.util.stream.Collectors;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.composing.AttoParserBasedComposer;
-import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
-import com.rewedigital.composer.composing.TemplateComposer;
-import com.rewedigital.composer.composing.ValidatingContentFetcher;
 import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Response;
@@ -33,7 +29,7 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("should not be included"));
 
         final Response<String> result = composer
-            .composeTemplate(r("template <rewe-digital-include></rewe-digital-include> content"))
+            .composeTemplate(r("template <include></include> content"), "template-path")
             .get()
             .response();
 
@@ -47,7 +43,8 @@ public class TemplateComposerTest {
 
         final Response<String> result = composer
             .composeTemplate(r(
-                "template content <rewe-digital-include path=\"http://mock/\"></rewe-digital-include> more content"))
+                "template content <include path=\"http://mock/\"></include> more content"),
+                "template-path")
             .get().response();
 
         assertThat(result.payload()).contains("template content " + content + " more content");
@@ -58,7 +55,8 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("",
             "<link href=\"css/link\" data-rd-options=\"include\" rel=\"stylesheet\"/>"));
         final Response<String> result = composer
-            .composeTemplate(r("<head></head><rewe-digital-include path=\"http://mock/\"></rewe-digital-include>"))
+            .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"),
+                "template-path")
             .get().response();
         assertThat(result.payload()).contains(
             "<head><link rel=\"stylesheet\" data-rd-options=\"include\" href=\"css/link\" />\n" +
@@ -70,10 +68,10 @@ public class TemplateComposerTest {
         final String innerContent = "some content";
         final TemplateComposer composer = makeComposer(
             aClientWithConsecutiveContent(
-                "<rewe-digital-include path=\"http://other/mock/\"></rewe-digital-include>",
+                "<include path=\"http://other/mock/\"></include>",
                 innerContent));
         final Response<String> result = composer
-            .composeTemplate(r("<rewe-digital-include path=\"http://mock/\"></rewe-digital-include>"))
+            .composeTemplate(r("<include path=\"http://mock/\"></include>"), "template-path")
             .get().response();
         assertThat(result.payload()).contains(innerContent);
     }
@@ -83,9 +81,11 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientReturning(Status.BAD_REQUEST));
         final Response<String> result = composer
             .composeTemplate(
-                r("template content <rewe-digital-include path=\"http://mock/\"><rewe-digital-content><div>default content</div></rewe-digital-content></rewe-digital-include>"))
+                r("template content <include path=\"http://mock/\"><content>"
+                    + "<div>default content</div></content></include>"),
+                "template-path")
             .get().response();
-        assertThat(result.payload().get()).contains("template content <div>default content</div>");
+        assertThat(result.payload()).contains("template content <div>default content</div>");
     }
 
     @Test
@@ -95,8 +95,9 @@ public class TemplateComposerTest {
 
         final SessionRoot result = composer
             .composeTemplate(r(
-                "template content <rewe-digital-include path=\"http://mock/\"></rewe-digital-include> more content")
-                    .withHeader("x-rd-session-key-template", "session-val-template"))
+                "template content <include path=\"http://mock/\"></include> more content")
+                    .withHeader("x-rd-session-key-template", "session-val-template"),
+                "template-path")
             .get().session();
 
         assertThat(result.get("session-key-template")).contains("session-val-template");
@@ -104,11 +105,33 @@ public class TemplateComposerTest {
         assertThat(result.isDirty()).isTrue();
     }
 
+    @Test
+    public void limitsRecursionDepth() throws Exception {
+        final int maxRecursion = 1;
+        final String fallbackContent = "fallback";
+        final TemplateComposer composer = makeComposerWithMaxRecursion(
+            aClientWithConsecutiveContent(
+                "<include path=\"include-exceeding-max-recursion\"><content>"
+                    + fallbackContent + "</content></include>",
+                "inner content should not be present"),
+            maxRecursion);
+        final Response<String> result = composer
+            .composeTemplate(r("<include path=\"include-in-template\"></include>"),
+                "template-path")
+            .get().response();
+        assertThat(result.payload()).contains(fallbackContent);
+    }
+
     private TemplateComposer makeComposer(final Client client) {
+        return makeComposerWithMaxRecursion(client, 10);
+    }
+
+    private TemplateComposer makeComposerWithMaxRecursion(final Client client, final int maxRecursion) {
         final SessionRoot session = SessionRoot.empty();
         return new AttoParserBasedComposer(
             new ValidatingContentFetcher(client, Collections.emptyMap(), session), session,
-            new ComposerHtmlConfiguration("rewe-digital-include", "rewe-digital-content", "data-rd-options"));
+            new ComposerHtmlConfiguration("include", "content", "data-rd-options",
+                maxRecursion));
     }
 
     private Client aClientWithSimpleContent(final String content) {
@@ -154,8 +177,8 @@ public class TemplateComposerTest {
     private Response<ByteString> contentResponse(final String content, final String head) {
         return Response
             .forPayload(
-                encodeUtf8("<html><head>" + head + "</head><body><rewe-digital-content>" + content
-                    + "</rewe-digital-content></body></html>"))
+                encodeUtf8("<html><head>" + head + "</head><body><content>" + content
+                    + "</content></body></html>"))
             .withHeader("Content-Type", "text/html");
     }
 
