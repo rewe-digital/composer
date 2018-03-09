@@ -25,7 +25,8 @@ public class DependenciesTest {
     @Test
     public void clientDoesNotRelyOnComposing() {
         class ComRewedigitalComposer extends DependencyRuler {
-            DependencyRule client, composing, configuration, parser, proxy, routing, session;
+            DependencyRule client, composing, configuration, parser, proxy, routing, session, caching;
+
 
             @Override
             public void defineRules() {
@@ -35,10 +36,10 @@ public class DependenciesTest {
                 parser.mustNotUse(all());
                 configuration.mustNotUse(all());
 
-                composing.mayUse(client, parser, session);
+                composing.mayUse(client, parser, session, caching);
                 proxy.mayUse(composing, routing, session);
                 routing.mayUse(composing, session);
-                session.mustNotUse(client, parser, composing, proxy);
+                session.mustNotUse(client, parser, composing, proxy, caching);
             }
         }
 
@@ -46,7 +47,7 @@ public class DependenciesTest {
             .withRelativeRules(new ComRewedigitalComposer())
             .withExternals("java.*", "org.*", "net.*", "com.spotify.*", "com.google.*",
                 "com.damnhandy.*", "okio", "com.fasterxml.*", "com.typesafe.*", "io.jsonwebtoken", "io.jsonwebtoken.*",
-                "javax.*");
+                "javax.*", "com.github.benmanes.caffeine.*");
 
         final DependencyResult result = new DependencyAnalyzer(config).rules(rules).analyze();
 

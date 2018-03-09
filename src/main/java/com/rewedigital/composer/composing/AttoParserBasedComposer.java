@@ -3,7 +3,6 @@ package com.rewedigital.composer.composing;
 import static java.util.Objects.requireNonNull;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.BiFunction;
 
 import com.rewedigital.composer.parser.Parser;
 import com.rewedigital.composer.session.ResponseWithSession;
@@ -35,10 +34,12 @@ public class AttoParserBasedComposer implements ContentComposer, TemplateCompose
         return parse(bodyOf(templateResponse), ContentRange.allUpToo(bodyOf(templateResponse).length()))
             .composeIncludes(contentFetcher, this, CompositionStep.root(templatePath))
             .thenApply(c -> c.withSession(SessionFragment.of(templateResponse)))
-            .thenApply(c -> c.map(toResponse()));
+            .thenApply(c -> c.extract(response()))
+            // temporary solution: correct cache-control header should be computed during composition
+            .thenApply(r -> r.transform(response -> response.withHeader("Cache-Control", "no-store,max-age=0")));
     }
 
-    private BiFunction<String, SessionFragment, ResponseWithSession<String>> toResponse() {
+    private Composition.Extractor<ResponseWithSession<String>> response() {
         return (payload, sessionFragment) -> new ResponseWithSession<String>(Response.forPayload(payload),
             session.mergedWith(sessionFragment));
     }
