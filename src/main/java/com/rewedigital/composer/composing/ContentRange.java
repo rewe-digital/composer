@@ -46,7 +46,7 @@ class ContentRange {
         if (getClass() != obj.getClass())
             return false;
         ContentRange other = (ContentRange) obj;
-        return Objects.equals(this.end, other.end) && Objects.equals(this.start, other.start);
+        return this.end == other.end && this.start == other.start;
     }
 
     @Override

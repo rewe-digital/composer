@@ -54,7 +54,7 @@ Using content tags to mark the content to be included allows the response of som
 
 **Specify assets required for included content**
 
-Content fragments usually need some assets like css and/or javascript to work. For this. content responses can mark asset links using a special data attribute. The name of this attribute is *data-rd-options* and can be changed via configuration. If an asset link in the html head of the content response contains the `data-rd-options` attribute with value `include`, this link is included in the head of the document returned to the caller.
+Content fragments usually need some assets like css and/or javascript to work. For this. content responses can mark asset links resp. script includes in their head section using a special data attribute. The name of this attribute is *data-rd-options* and can be changed via configuration. If an asset link/script in the html head of the content response contains the `data-rd-options` attribute with value `include`, this link/script is included in the head of the document returned to the caller.
 
 *Example*
 ```

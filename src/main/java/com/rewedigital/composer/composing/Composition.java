@@ -36,50 +36,47 @@ class Composition {
     }
 
     private final List<Composition> children;
-    private final List<String> assetLinks;
+    private final List<Asset> assets;
     private final int startOffset;
     private final int endOffset;
     private final String template;
     private final ContentRange contentRange;
     private final SessionFragment session;
 
-    private Composition(final String template, final ContentRange contentRange, final List<String> assetLinks,
+    private Composition(final String template, final ContentRange contentRange, final List<Asset> assets,
         final List<Composition> children) {
-        this(0, template.length(), template, contentRange, assetLinks, SessionFragment.empty(), children);
+        this(0, template.length(), template, contentRange, assets, SessionFragment.empty(), children);
     }
 
     private Composition(final int startOffset, final int endOffset, final String template,
-        final ContentRange contentRange, final List<String> assetLinks, final SessionFragment session,
+        final ContentRange contentRange, final List<Asset> assets,
+        final SessionFragment session,
         final List<Composition> children) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.template = template;
         this.contentRange = contentRange;
-        this.assetLinks = assetLinks;
+        this.assets = assets;
         this.children = children;
         this.session = session;
     }
 
     public Composition forRange(final int startOffset, final int endOffset) {
-        return new Composition(startOffset, endOffset, template, contentRange, assetLinks, session,
+        return new Composition(startOffset, endOffset, template, contentRange, assets, session,
             children);
     }
 
     public Composition withSession(final SessionFragment session) {
-        return new Composition(startOffset, endOffset, template, contentRange, assetLinks,
+        return new Composition(startOffset, endOffset, template, contentRange, assets,
             this.session.mergedWith(session), children);
     }
 
-    public static Composition of(final String template, final ContentRange contentRange,
-        final List<String> assetLinks, final List<Composition> children) {
-        return new Composition(template, contentRange, assetLinks, children);
+    public static Composition of(final String template, final ContentRange contentRange, final List<Asset> assets,
+        final List<Composition> children) {
+        return new Composition(template, contentRange, assets, children);
     }
 
-    public <R> R map(final BiFunction<String, SessionFragment, R> mapping) {
-        return mapping.apply(withAssetLinks(body()), mergedSession());
-    }
-
-    public <R> R extract(Extractor<R> extractor) {
+    public <R> R extract(final Extractor<R> extractor) {
         return extractor.extract(withAssetLinks(body()), mergedSession());
     }
 
@@ -90,7 +87,7 @@ class Composition {
             writer.write(template, currentIndex, c.startOffset - currentIndex);
             writer.write(c.body());
             currentIndex = c.endOffset;
-            assetLinks.addAll(c.assetLinks);
+            assets.addAll(c.assets);
         }
         writer.write(template, currentIndex, contentRange.end() - currentIndex);
         return writer.toString();
@@ -104,9 +101,11 @@ class Composition {
     }
 
     private String withAssetLinks(final String body) {
-        final String assets = assetLinks.stream()
-            .distinct()
-            .collect(Collectors.joining("\n"));
-        return body.replaceFirst("</head>", assets + "\n</head>");
+        final String renderedAssets =
+            assets.stream().distinct()
+                .map(Asset::render)
+                .collect(Collectors.joining("\n"));
+
+        return body.replaceFirst("</head>", renderedAssets + "\n</head>");
     }
 }

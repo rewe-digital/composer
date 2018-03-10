@@ -30,16 +30,15 @@ class IncludeMarkupHandler extends AbstractMarkupHandler {
     }
 
     public IncludeProcessor buildProcessor(final String template) {
-        return new IncludeProcessor(template, includedServices, contentRange(),
-            assetLinks());
+        return new IncludeProcessor(template, includedServices, contentRange(), assets());
     }
 
     private ContentRange contentRange() {
         return contentMarkupHandler.contentRange();
     }
 
-    private List<String> assetLinks() {
-        return contentMarkupHandler.assetLinks();
+    private List<Asset> assets() {
+        return contentMarkupHandler.assets();
     }
 
     @Override

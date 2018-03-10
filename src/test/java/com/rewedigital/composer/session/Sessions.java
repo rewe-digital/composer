@@ -28,9 +28,13 @@ public class Sessions {
     }
 
     public static SessionRoot sessionRootExpiringAt(final long epochSeconds, final String key, final String value) {
+        return sessionRootExpiringAt(Long.toString(epochSeconds), key, value);
+    }
+
+    public static SessionRoot sessionRootExpiringAt(final String expireAt, final String key, final String value) {
         final Map<String, String> data = new HashMap<>();
         data.put("x-rd-session-id", "1234");
-        data.put("expires-at", Long.toString(epochSeconds));
+        data.put("expires-at", expireAt);
         data.put(key, value);
         return SessionRoot.of(data);
     }

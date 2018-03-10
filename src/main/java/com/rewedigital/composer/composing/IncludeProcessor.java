@@ -15,15 +15,15 @@ class IncludeProcessor {
 
     private final List<IncludedService> includedServices;
     private final ContentRange contentRange;
-    private final List<String> assetLinks;
     private final String template;
+    private final List<Asset> assets;
 
     public IncludeProcessor(final String template, final List<IncludedService> includedServices,
-        final ContentRange contentRange, final List<String> assetLinks) {
+        final ContentRange contentRange, final List<Asset> assets) {
         this.template = template;
         this.includedServices = includedServices;
         this.contentRange = contentRange;
-        this.assetLinks = assetLinks;
+        this.assets = assets;
     }
 
     public CompletableFuture<Composition> composeIncludes(final ContentFetcher contentFetcher,
@@ -33,7 +33,7 @@ class IncludeProcessor {
             .map(s -> s.fetch(contentFetcher, step)
                 .thenCompose(r -> r.compose(composer)));
         return flatten(composedIncludes)
-            .thenApply(c -> Composition.of(template, contentRange, assetLinks, c.collect(toList())));
+            .thenApply(c -> Composition.of(template, contentRange, assets, c.collect(toList())));
     }
 
     private static <T> CompletableFuture<Stream<T>> flatten(final Stream<CompletableFuture<T>> com) {

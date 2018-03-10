@@ -59,7 +59,21 @@ public class TemplateComposerTest {
                 "template-path")
             .get().response();
         assertThat(result.payload()).contains(
-            "<head><link rel=\"stylesheet\" data-rd-options=\"include\" href=\"css/link\" />\n" +
+            "<head><link rel=\"stylesheet\" href=\"css/link\" />\n" +
+                "</head>");
+    }
+
+    @Test
+    public void appendsScriptLinksToHead() throws Exception {
+        final TemplateComposer composer = makeComposer(aClientWithSimpleContent("",
+            "<script src=\"js/link/script.js\" data-rd-options=\"include\" type=\"text/javascript\"></script>"));
+        final Response<String> result = composer
+            .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"),
+                "template-path")
+            .get().response();
+        assertThat(result.payload()).contains(
+            "<head><script type=\"text/javascript\" src=\"js/link/script.js\" ></script>\n"
+                +
                 "</head>");
     }
 
@@ -121,9 +135,9 @@ public class TemplateComposerTest {
             .get().response();
         assertThat(result.payload()).contains(fallbackContent);
     }
-    
+
     @Test
-    public void setsNoStoreCacheHeaderIfNoCacheHeaderFromComposition() throws Exception{
+    public void setsNoStoreCacheHeaderIfNoCacheHeaderFromComposition() throws Exception {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("content"));
 
         final Response<String> result = composer

@@ -14,21 +14,24 @@ public class ContentMarkupHandlerTest {
     private static final ContentRange defaultContentRange = new ContentRange(123, 456);
 
     @Test
-    public void parsesStylesheetLinksFromHead() {
-        final List<String> result = parse("<!DOCTYPE html><html>\n" +
+    public void parsesAssetsFromHead() {
+        final List<Asset> result = parse("<!DOCTYPE html><html>\n" +
             "<head>"
-            + "<link href=\"../static/css/core.css\" data-rd-options=\"include-in-head\" rel=\"stylesheet\" media=\"screen\" />"
-            + "<link href=\"../static/css/other.css\" data-rd-options=\"include-in-head\" rel=\"stylesheet\" media=\"screen\"></link>"
+            + "<link href=\"../static/css/core.css\" data-rd-options=\"include\" rel=\"stylesheet\" media=\"screen\" />"
+            + "<script href=\"../static/js/other.js\" data-rd-options=\"include\" ></script>"
             + "<link href=\"../static/css/removed_from_head.css\" rel=\"stylesheet\" media=\"screen\" />"
             + "</head>\n" +
             "<body>"
             + "<link href=\"../static/css/removed_from_body.css\" rel=\"stylesheet\" media=\"screen\" />"
-            + "</body></html>").assetLinks();
+            + "</body></html>").assets();
 
         assertEquals(
             Arrays.asList(
-                "<link rel=\"stylesheet\" data-rd-options=\"include-in-head\" href=\"../static/css/core.css\" media=\"screen\" />",
-                "<link rel=\"stylesheet\" data-rd-options=\"include-in-head\" href=\"../static/css/other.css\" media=\"screen\" />"),
+                new Asset.Builder("data-rd-options").type("link").attribute("rel", "stylesheet")
+                    .attribute("data-rd-options", "include").attribute("href", "../static/css/core.css")
+                    .attribute("media", "screen").selfClosing(true).build(),
+                new Asset.Builder("data-rd-options").type("script").attribute("data-rd-options", "include")
+                    .attribute("href", "../static/js/other.js").selfClosing(false).build()),
             result);
     }
 

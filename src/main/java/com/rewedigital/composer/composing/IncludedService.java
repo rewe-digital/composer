@@ -64,9 +64,7 @@ class IncludedService {
             this.response = response;
             this.step = step;
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("included service response: {} received via {}", response, step.callStack());
-            }
+            LOGGER.debug("included service response: {} received via {}", response, step);
         }
 
         public CompletableFuture<Composition> compose(final ContentComposer contentComposer) {

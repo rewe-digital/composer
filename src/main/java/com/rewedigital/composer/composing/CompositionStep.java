@@ -38,4 +38,9 @@ public class CompositionStep {
 
         return "[" + path + "] included via " + parent.callStack();
     }
+
+    @Override
+    public String toString() {
+        return callStack();
+    }
 }

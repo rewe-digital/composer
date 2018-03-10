@@ -38,14 +38,7 @@ public class Match {
         if (getClass() != obj.getClass())
             return false;
         final Match other = (Match) obj;
-        if (backend == null) {
-            if (other.backend != null)
-                return false;
-        } else if (!backend.equals(other.backend))
-            return false;
-        if (routeType != other.routeType)
-            return false;
-        return true;
+        return Objects.equals(backend, other.backend) && routeType == other.routeType;
     }
 
 

@@ -84,6 +84,16 @@ public class LocalSessionIdInterceptorTest {
         assertThat(session.isDirty()).isFalse();
     }
 
+    @Test
+    public void exiresSessionIfExiresAtNotParseable() throws Exception {
+        final SessionRoot initialSession = sessionRootExpiringAt("not-a-long", "x-rd-key", "value");
+        final LocalSessionIdInterceptor interceptor = new LocalSessionIdInterceptor(config(ttl, renewAfter));
+        final SessionRoot session =
+            interceptor.afterCreation(initialSession, contextForArrivalTime(0))
+                .toCompletableFuture().get();
+        assertThat(session.get("key")).isNotPresent();
+    }
+
     private RequestContext context() {
         return contextForArrivalTime(0);
     }
