@@ -26,24 +26,29 @@ public class ValidatingContentFetcher implements ContentFetcher {
 
     public ValidatingContentFetcher(final Client client, final Map<String, Object> parsedPathArguments,
         final SessionRoot session) {
-        this.session = session;
+        this.session = requireNonNull(session);
         this.client = requireNonNull(client);
         this.parsedPathArguments = requireNonNull(parsedPathArguments);
     }
 
     @Override
-    public CompletableFuture<Response<String>> fetch(final String path, final String fallback,
-        final CompositionStep step) {
-        if (path == null || path.trim().isEmpty()) {
+    public CompletableFuture<Response<String>> fetch(final FetchContext context, final CompositionStep step) {
+        if (context.hasEmptyPath()) {
             LOGGER.warn("Empty path attribute in include found - callstack: " + step.callStack());
             return CompletableFuture.completedFuture(Response.forPayload(""));
         }
 
-        final String expandedPath = UriTemplate.fromTemplate(path).expand(parsedPathArguments);
-        return client.send(session.enrich(Request.forUri(expandedPath, "GET")))
+        final String expandedPath = UriTemplate.fromTemplate(context.path()).expand(parsedPathArguments);
+        final Request request = session.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
+
+        return client.send(request)
             .thenApply(response -> acceptHtmlOnly(response, expandedPath))
-            .thenApply(r -> toStringPayload(r, fallback))
+            .thenApply(r -> toStringPayload(r, context.fallback()))
             .toCompletableFuture();
+    }
+
+    private Request withTtl(final Request request, final FetchContext context) {
+        return context.ttl().map(t -> request.withTtl(t)).orElse(request);
     }
 
     private Response<String> toStringPayload(final Response<ByteString> response, final String fallback) {

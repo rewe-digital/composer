@@ -1,12 +1,15 @@
 package com.rewedigital.composer.composing;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.spotify.apollo.Response;
 
 /**
@@ -86,24 +89,43 @@ class IncludedService {
         this.fallback = builder.fallback;
     }
 
-
     public CompletableFuture<IncludedService.WithResponse> fetch(final ContentFetcher fetcher,
         final CompositionStep parentStep) {
         final CompositionStep step = parentStep.childWith(path());
-        return fetcher.fetch(path(), fallback(), step)
+        return fetcher.fetch(FetchContext.of(path(), fallback(), ttl()), step)
             .thenApply(r -> new WithResponse(step, startOffset, endOffset, r));
-    }
-
-    private String fallback() {
-        return fallback;
-    }
-
-    private String path() {
-        return attributes.getOrDefault("path", "");
     }
 
     public boolean isInRage(final ContentRange contentRange) {
         return contentRange.isInRange(startOffset);
+    }
+
+    @VisibleForTesting
+    public String fallback() {
+        return fallback;
+    }
+
+    @VisibleForTesting
+    public String path() {
+        return attributes.getOrDefault("path", "");
+    }
+
+    @VisibleForTesting
+    public Optional<Duration> ttl() {
+        return longFromMap("ttl").map(Duration::ofMillis);
+    }
+
+    private Optional<Long> longFromMap(final String name) {
+        if (!attributes.containsKey(name)) {
+            return Optional.empty();
+        }
+        final String unparsedValue = attributes.get(name);
+        try {
+            return Optional.of(Long.parseLong(unparsedValue));
+        } catch (final NumberFormatException nfEx) {
+            LOGGER.info("Not able to evaluate {} for path {} with value {}.", name, path(), unparsedValue);
+        }
+        return Optional.empty();
     }
 
 }

@@ -1,8 +1,10 @@
 package com.rewedigital.composer.routing;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 
+import java.time.Duration;
+import java.util.List;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +27,7 @@ public class RoutingConfiguration {
     }
 
     private static List<Rule<Match>> buildLocalRoutes(final ConfigList routesConfig) {
-        return routesConfig.stream().map(RoutingConfiguration::buildLocalRoute).collect(Collectors.toList());
+        return routesConfig.stream().map(RoutingConfiguration::buildLocalRoute).collect(toList());
     }
 
     private static Rule<Match> buildLocalRoute(final ConfigValue configValue) {
@@ -34,16 +36,20 @@ public class RoutingConfiguration {
         final String method = config.getString("method");
         final String type = config.getString("type");
         final String target = config.getString("target");
+        final Optional<Duration> ttl = optionalDuration(config, "ttl");
 
-        final Rule<Match> result = Rule.fromUri(path, method, Match.of(target, RouteTypeName.valueOf(type)));
-        LOGGER.info("Registered local route for path={}, method={}, target={}, type={}", path, method,
-            target, type);
+        final Rule<Match> result = Rule.fromUri(path, method, Match.of(target, ttl, RouteTypeName.valueOf(type)));
+        LOGGER.info("Registered local route for path={}, method={}, target={}, type={} with a request ttl={}", path,
+            method,target, type, ttl);
         return result;
-
     }
 
     public List<Rule<Match>> localRules() {
         return localRoutes;
+    }
+    
+    private static Optional<Duration> optionalDuration(final Config config, final String path) {
+        return config.hasPath(path) ? Optional.of(config.getDuration(path)) : Optional.empty();
     }
 
 }

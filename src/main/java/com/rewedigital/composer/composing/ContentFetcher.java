@@ -9,6 +9,6 @@ import com.spotify.apollo.Response;
  */
 public interface ContentFetcher {
 
-    CompletableFuture<Response<String>> fetch(String path, String fallback, CompositionStep step);
+    CompletableFuture<Response<String>> fetch(FetchContext fetchContext, CompositionStep step);
 
 }
