@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.rewedigital.composer.helper.RequestMatching;
@@ -161,6 +162,12 @@ public class TemplateComposerTest {
             .get();
 
         verify(client).send(argThat(RequestMatching.with("http://mock/", ttl)));
+    }
+
+    @Test
+    @Ignore
+    public void composesCacheHeaderFromFragments() throws Exception {
+
     }
 
     private TemplateComposer makeComposer(final Client client) {
