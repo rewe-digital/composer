@@ -19,6 +19,7 @@ public class CacheControlComposer {
         return this;
     }
 
+    //
     private void maxAge(final int maxAge) {
         if (maxAge >= 0 && (this.maxAgeSeconds < 0 || maxAge < this.maxAgeSeconds)) {
             this.maxAgeSeconds = maxAge;
