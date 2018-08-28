@@ -68,7 +68,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
     }
     
     private Response<ByteString> acceptOkStatusOnly(final Response<ByteString> response, final String expandedPath) {
-    	if(response.status().family().equals(Family.familyOf(200))) {
+    	if(response.status().family().equals(Family.SUCCESSFUL)) {
     		return response;
     	}
     	return response.withPayload(null);
