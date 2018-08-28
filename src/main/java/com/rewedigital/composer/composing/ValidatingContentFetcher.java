@@ -13,6 +13,7 @@ import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
+import com.spotify.apollo.StatusType.Family;
 
 import okio.ByteString;
 
@@ -43,6 +44,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
 
         return client.send(request)
             .thenApply(response -> acceptHtmlOnly(response, expandedPath))
+            .thenApply(response -> acceptOkStatusOnly(response, expandedPath))
             .thenApply(r -> toStringPayload(r, context.fallback()))
             .toCompletableFuture();
     }
@@ -63,5 +65,12 @@ public class ValidatingContentFetcher implements ContentFetcher {
         }
         LOGGER.warn("Content-Type of [{}] is not text/html, returning an empty body.", expandedPath);
         return response.withPayload(null);
+    }
+    
+    private Response<ByteString> acceptOkStatusOnly(final Response<ByteString> response, final String expandedPath) {
+    	if(response.status().family().equals(Family.familyOf(200))) {
+    		return response;
+    	}
+    	return response.withPayload(null);
     }
 }

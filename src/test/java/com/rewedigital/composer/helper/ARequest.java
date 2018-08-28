@@ -9,7 +9,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 import com.spotify.apollo.Request;
 
-public class RequestMatching {
+public class ARequest {
 
     public static Matcher<Request> withoutHeader(final String... headerNames) {
         return new TypeSafeMatcher<Request>() {
@@ -69,7 +69,7 @@ public class RequestMatching {
         };
     }
 
-    public static Matcher<Request> with(final String path, final long ttl) {
+    public static Matcher<Request> matching(final String path, final long ttl) {
         return new TypeSafeMatcher<Request>() {
 
             @Override
