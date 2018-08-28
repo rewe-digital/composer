@@ -85,10 +85,10 @@ public class ComposingTemplatesTest {
 
 	@Test
 	public void composes_content_from_recursive_downstream_calls_into_template() throws Exception {
-		given_first_downstream_call_returns_in_body("<include path=\"http://other/mock/\"></include>");
-		given_next_downstream_call_returns_in_body("some content");
+		given_first_downstream_call_returns_in_body("first part <include path=\"http://other/mock/\"></include>");
+		given_next_downstream_call_returns_in_body("second part");
 		when_composing_a_template("<include path=\"http://mock/\"></include>");
-		then_the_result_should_be("some content");
+		then_the_result_should_be("first part second part");
 	}
 
 	@Test
