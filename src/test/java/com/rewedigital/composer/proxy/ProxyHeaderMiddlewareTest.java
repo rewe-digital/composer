@@ -14,7 +14,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import com.rewedigital.composer.helper.RequestMatching;
+import com.rewedigital.composer.helper.ARequest;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -33,7 +33,7 @@ public class ProxyHeaderMiddlewareTest {
         final AsyncHandler<Response<ByteString>> innerHandler = mock(AsyncHandler.class);
         final Request original = withHopByHopHeaders(Request.forUri("/"));
         ProxyHeaderMiddleware.apply(innerHandler).invoke(aContextFor(original));
-        verify(innerHandler).invoke(aContextWith(RequestMatching.withoutHeader(hopByHopHeaders)));
+        verify(innerHandler).invoke(aContextWith(ARequest.withoutHeader(hopByHopHeaders)));
     }
 
     @Test
@@ -42,7 +42,7 @@ public class ProxyHeaderMiddlewareTest {
         final AsyncHandler<Response<ByteString>> innerHandler = mock(AsyncHandler.class);
         final Request original = Request.forUri("/").withHeader("Cache-Control", "no-cache");
         ProxyHeaderMiddleware.apply(innerHandler).invoke(aContextFor(original));
-        verify(innerHandler).invoke(aContextWith(RequestMatching.withHeader("Cache-Control", "no-cache")));
+        verify(innerHandler).invoke(aContextWith(ARequest.withHeader("Cache-Control", "no-cache")));
     }
 
     @Test
@@ -51,7 +51,7 @@ public class ProxyHeaderMiddlewareTest {
         final AsyncHandler<Response<ByteString>> innerHandler = mock(AsyncHandler.class);
         final Request original = Request.forUri("/some/path");
         ProxyHeaderMiddleware.apply(innerHandler).invoke(aContextFor(original));
-        verify(innerHandler).invoke(aContextWith(RequestMatching.withHeader("x-forwarded-path", "/some/path")));
+        verify(innerHandler).invoke(aContextWith(ARequest.withHeader("x-forwarded-path", "/some/path")));
     }
 
     private Request withHopByHopHeaders(final Request request) {

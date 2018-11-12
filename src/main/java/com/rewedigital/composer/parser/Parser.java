@@ -9,9 +9,6 @@ import org.attoparser.ParseException;
 import org.attoparser.config.ParseConfiguration;
 import org.attoparser.config.ParseConfiguration.ElementBalancing;
 
-import com.google.common.base.Throwables;
-
-
 public class Parser {
 
     private static final IMarkupParser _PARSER = new MarkupParser(parserConfig());
@@ -29,7 +26,7 @@ public class Parser {
         try {
             _PARSER.parse(template, markupHandler);
         } catch (final ParseException e) {
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 }

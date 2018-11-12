@@ -9,7 +9,7 @@ import org.hamcrest.TypeSafeMatcher;
 
 import com.spotify.apollo.Request;
 
-public class RequestMatching {
+public class ARequest {
 
     public static Matcher<Request> withoutHeader(final String... headerNames) {
         return new TypeSafeMatcher<Request>() {
@@ -68,20 +68,24 @@ public class RequestMatching {
             }
         };
     }
-
-    public static Matcher<Request> with(final String path, final long ttl) {
+    
+    public static Matcher<Request> matching(final String path, final Optional<Long> ttl) {
         return new TypeSafeMatcher<Request>() {
 
             @Override
             public void describeTo(final Description description) {
                 description.appendText("a request for path=").appendValue(path).appendText(" with ttl=")
-                    .appendValue(ttl);
+                .appendValue(ttl);
             }
 
             @Override
             protected boolean matchesSafely(final Request item) {
-                return path.equals(item.uri()) && Optional.of(ttl).equals(item.ttl().map(d -> d.toMillis()));
+                return path.equals(item.uri()) && ttl.equals(item.ttl().map(d -> d.toMillis()));
             }
         };
+    }
+
+    public static Matcher<Request> matching(final String path, final long ttl) {
+    	return matching(path, Optional.of(ttl));
     }
 }
