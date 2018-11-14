@@ -14,7 +14,7 @@ import com.rewedigital.composer.proxy.ComposingRequestHandler;
 import com.rewedigital.composer.proxy.ProxyHeaderMiddleware;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.routing.SessionAwareProxyClient;
+import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.spotify.apollo.AppInit;
 import com.spotify.apollo.Environment;
@@ -65,7 +65,7 @@ public class ComposerApplication {
                     new BackendRouting(configuration.getConfig("composer.routing")),
                     new RouteTypes(
                         new ComposerFactory(configuration.getConfig("composer.html")),
-                        new SessionAwareProxyClient()),
+                        new ExtensionAwareRequestClient()),
                     new CookieBasedSessionHandler.Factory(configuration.getConfig("composer.session")));
 
             registerRoutes(environment, handler, "/");

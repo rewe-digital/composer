@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.damnhandy.uri.template.UriTemplate;
-import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -22,11 +22,11 @@ public class ValidatingContentFetcher implements ContentFetcher {
 
     private final Client client;
     private final Map<String, Object> parsedPathArguments;
-    private final SessionRoot session;
+    private final RequestEnricher requestEnricher;
 
     public ValidatingContentFetcher(final Client client, final Map<String, Object> parsedPathArguments,
-        final SessionRoot session) {
-        this.session = requireNonNull(session);
+            final RequestEnricher requestEnricher) {
+        this.requestEnricher = requireNonNull(requestEnricher);
         this.client = requireNonNull(client);
         this.parsedPathArguments = requireNonNull(parsedPathArguments);
     }
@@ -39,12 +39,10 @@ public class ValidatingContentFetcher implements ContentFetcher {
         }
 
         final String expandedPath = UriTemplate.fromTemplate(context.path()).expand(parsedPathArguments);
-        final Request request = session.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
+        final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
 
-        return client.send(request)
-            .thenApply(response -> acceptHtmlOnly(response, expandedPath))
-            .thenApply(r -> toStringPayload(r, context.fallback()))
-            .toCompletableFuture();
+        return client.send(request).thenApply(response -> acceptHtmlOnly(response, expandedPath))
+                .thenApply(r -> toStringPayload(r, context.fallback())).toCompletableFuture();
     }
 
     private Request withTtl(final Request request, final FetchContext context) {

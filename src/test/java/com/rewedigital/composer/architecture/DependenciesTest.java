@@ -1,9 +1,10 @@
 package com.rewedigital.composer.architecture;
 
 import static guru.nidi.codeassert.junit.CodeAssertMatchers.hasNoCycles;
-import static guru.nidi.codeassert.junit.CodeAssertMatchers.matchesRulesExactly;
+import static guru.nidi.codeassert.junit.CodeAssertMatchers.*;
 import static org.junit.Assert.assertThat;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import guru.nidi.codeassert.config.AnalyzerConfig;
@@ -21,8 +22,24 @@ public class DependenciesTest {
     public void noCycles() {
         assertThat(new DependencyAnalyzer(config).analyze(), hasNoCycles());
     }
+    
+    @Test
+    public void composingDoesNotDependOnSession() {
+        class ComRewedigitalComposer extends DependencyRuler {
+            DependencyRule composing, session;
+            
+            @Override
+            public void defineRules() {
+                composing.mustNotUse(session);
+            }
+        }
+        final DependencyRules rules =DependencyRules.allowAll().withRelativeRules(new ComRewedigitalComposer());
+        final DependencyResult result = new DependencyAnalyzer(config).rules(rules).analyze();
+        assertThat(result, matchesRulesIgnoringUndefined());
+    }
 
     @Test
+    @Ignore
     public void clientDoesNotRelyOnComposing() {
         class ComRewedigitalComposer extends DependencyRuler {
             DependencyRule client, composing, configuration, parser, proxy, routing, session, caching, util;
@@ -36,7 +53,7 @@ public class DependenciesTest {
                 parser.mustNotUse(all());
                 configuration.mustNotUse(all());
 
-                composing.mayUse(client, parser, session, caching);
+                composing.mayUse(client, parser, caching);
                 proxy.mayUse(composing, routing, session, util);
                 routing.mayUse(composing, session);
                 session.mustNotUse(client, parser, composing, proxy, caching).mayUse(util);

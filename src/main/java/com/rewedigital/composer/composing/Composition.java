@@ -5,34 +5,38 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import com.rewedigital.composer.session.SessionFragment;
+import com.rewedigital.composer.util.response.ExtensionFragment;
 
 /**
  * Contains the data of a (partial) composition.
  *
- * As the composition of content fragment into a web page is done recursively, this class describes one <em>sub
- * tree</em> of the final composition. Compositions are created leaf to root meaning, that first Composition objects for
- * the leafs are created, than the Composition for the parents and so on until the root Composition representing the
- * whole page is created.
+ * As the composition of content fragment into a web page is done recursively,
+ * this class describes one <em>sub tree</em> of the final composition.
+ * Compositions are created leaf to root meaning, that first Composition objects
+ * for the leafs are created, than the Composition for the parents and so on
+ * until the root Composition representing the whole page is created.
  *
- * The composition can be mapped to some result using {@link #map(BiFunction)}. The argument function takes two
- * arguments: the composed html body and the composed session. These values are calculated lazily.
+ * The composition can be mapped to some result using {@link #map(BiFunction)}.
+ * The argument function takes two arguments: the composed html body and the
+ * composed session. These values are calculated lazily.
  *
  * Regarding the html content, a Composition consists of the following:
  * <ul>
- * <li>The {@link #template} - this is the html template this Composition represents. It may contain one or more include
- * tags, for each of them a child Composition is available in {@link #children}</li>
- * <li>The {@link #contentRange} - this is the range of the template that should be included into the
- * <em>parent</em></li>
- * <li>The interval {@link #startOffset}, {@link #endOffset} - this describes the part of the <em>parent</em> that
- * should be replaced with <em>this</em> Composition</li>
+ * <li>The {@link #template} - this is the html template this Composition
+ * represents. It may contain one or more include tags, for each of them a child
+ * Composition is available in {@link #children}</li>
+ * <li>The {@link #contentRange} - this is the range of the template that should
+ * be included into the <em>parent</em></li>
+ * <li>The interval {@link #startOffset}, {@link #endOffset} - this describes
+ * the part of the <em>parent</em> that should be replaced with <em>this</em>
+ * Composition</li>
  * </ul>
  */
 class Composition {
 
     @FunctionalInterface
     public interface Extractor<T> {
-        public T extract(String body, SessionFragment session);
+        public T extract(String body, ExtensionFragment extension);
     }
 
     private final List<Composition> children;
@@ -41,43 +45,42 @@ class Composition {
     private final int endOffset;
     private final String template;
     private final ContentRange contentRange;
-    private final SessionFragment session;
+    private final ExtensionFragment extension;
 
     private Composition(final String template, final ContentRange contentRange, final List<Asset> assets,
-        final List<Composition> children) {
-        this(0, template.length(), template, contentRange, assets, SessionFragment.empty(), children);
+            final List<Composition> children) {
+        this(0, template.length(), template, contentRange, assets, ExtensionFragment.empty(),
+                children);
     }
 
     private Composition(final int startOffset, final int endOffset, final String template,
-        final ContentRange contentRange, final List<Asset> assets,
-        final SessionFragment session,
-        final List<Composition> children) {
+            final ContentRange contentRange, final List<Asset> assets, 
+            final ExtensionFragment extension, final List<Composition> children) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.template = template;
         this.contentRange = contentRange;
         this.assets = assets;
         this.children = children;
-        this.session = session;
+        this.extension = extension;
     }
 
     public Composition forRange(final int startOffset, final int endOffset) {
-        return new Composition(startOffset, endOffset, template, contentRange, assets, session,
-            children);
+        return new Composition(startOffset, endOffset, template, contentRange, assets, extension, children);
     }
 
-    public Composition withSession(final SessionFragment session) {
+    public Composition withExtension(ExtensionFragment extensionFragment) {
         return new Composition(startOffset, endOffset, template, contentRange, assets,
-            this.session.mergedWith(session), children);
+                extension.mergedWith(extensionFragment), children);
     }
 
     public static Composition of(final String template, final ContentRange contentRange, final List<Asset> assets,
-        final List<Composition> children) {
+            final List<Composition> children) {
         return new Composition(template, contentRange, assets, children);
     }
 
     public <R> R extract(final Extractor<R> extractor) {
-        return extractor.extract(withAssetLinks(body()), mergedSession());
+        return extractor.extract(withAssetLinks(body()), mergedExtensions());
     }
 
     private String body() {
@@ -93,19 +96,13 @@ class Composition {
         return writer.toString();
     }
 
-    private SessionFragment mergedSession() {
-        return session.mergedWith(children.stream()
-            .reduce(SessionFragment.empty(),
-                (s, c) -> s.mergedWith(c.mergedSession()),
-                (a, b) -> a.mergedWith(b)));
+    private ExtensionFragment mergedExtensions() {
+        return extension.mergedWith(children.stream().reduce(ExtensionFragment.empty(),
+                (f, c) -> f.mergedWith(c.mergedExtensions()), (a, b) -> a.mergedWith(b)));
     }
 
     private String withAssetLinks(final String body) {
-        final String renderedAssets =
-            assets.stream().distinct()
-                .map(Asset::render)
-                .collect(Collectors.joining("\n"));
-
+        final String renderedAssets = assets.stream().distinct().map(Asset::render).collect(Collectors.joining("\n"));
         return body.replaceFirst("</head>", renderedAssets + "\n</head>");
     }
 }

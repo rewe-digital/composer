@@ -10,7 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.Test;
 
 import com.rewedigital.composer.helper.Sessions;
-import com.rewedigital.composer.session.ResponseWithSession;
+import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.ExtendableResponse;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -30,13 +31,14 @@ public class SessionAwareProxyClientTest {
             Response.ok().withPayload(ByteString.EMPTY).withHeader("x-rd-response-key", "other-value");
 
         final RequestContext context = contextWith(aClient(expectedRequest, response), method);
-        final ResponseWithSession<ByteString> templateResponse =
-            new SessionAwareProxyClient().fetch(aRouteMatch(), context, Sessions.sessionRoot("x-rd-key", "value"))
+        final ExtendableResponse<ByteString> templateResponse =
+            new ExtensionAwareRequestClient().fetch(aRouteMatch(), context, Sessions.sessionRoot("x-rd-key", "value"))
                 .toCompletableFuture()
                 .get();
 
-        assertThat(templateResponse.session().get("key")).contains("value");
-        assertThat(templateResponse.session().get("response-key")).contains("other-value");
+        final SessionRoot sessionRoot = templateResponse.extensions().get(SessionRoot.class).get();
+        assertThat(sessionRoot.get("key")).contains("value");
+        assertThat(sessionRoot.get("response-key")).contains("other-value");
     }
 
     private RouteMatch aRouteMatch() {

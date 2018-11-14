@@ -6,10 +6,10 @@ import java.util.concurrent.CompletionStage;
 
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.session.ResponseWithSession;
 import com.rewedigital.composer.session.SessionHandler;
 import com.rewedigital.composer.session.SessionHandlerFactory;
 import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.ExtendableResponse;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
@@ -39,10 +39,10 @@ public class ComposingRequestHandler {
         });
     }
 
-    private static CompletableFuture<ResponseWithSession<ByteString>> defaultResponse(final SessionRoot session) {
+    private static CompletableFuture<ExtendableResponse<ByteString>> defaultResponse(final SessionRoot session) {
         final Response<ByteString> response =
             Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"));
         return CompletableFuture
-            .completedFuture(new ResponseWithSession<ByteString>(response, session));
+            .completedFuture(new ExtendableResponse<ByteString>(response, session));
     }
 }

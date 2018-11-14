@@ -10,6 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -20,6 +21,7 @@ import org.junit.Test;
 
 import com.rewedigital.composer.helper.RequestMatching;
 import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.Extension;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
@@ -33,9 +35,7 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("should not be included"));
 
         final Response<String> result = composer
-            .composeTemplate(r("template <include></include> content"), "template-path")
-            .get()
-            .response();
+                .composeTemplate(r("template <include></include> content"), "template-path").get().response();
 
         assertThat(result.payload()).contains("template  content");
     }
@@ -46,10 +46,9 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent(content));
 
         final Response<String> result = composer
-            .composeTemplate(r(
-                "template content <include path=\"http://mock/\"></include> more content"),
-                "template-path")
-            .get().response();
+                .composeTemplate(r("template content <include path=\"http://mock/\"></include> more content"),
+                        "template-path")
+                .get().response();
 
         assertThat(result.payload()).contains("template content " + content + " more content");
     }
@@ -57,37 +56,31 @@ public class TemplateComposerTest {
     @Test
     public void appendsCSSLinksToHead() throws Exception {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("",
-            "<link href=\"css/link\" data-rd-options=\"include\" rel=\"stylesheet\"/>"));
+                "<link href=\"css/link\" data-rd-options=\"include\" rel=\"stylesheet\"/>"));
         final Response<String> result = composer
-            .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"),
-                "template-path")
-            .get().response();
-        assertThat(result.payload()).contains(
-            "<head><link rel=\"stylesheet\" href=\"css/link\" />\n</head>");
+                .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"), "template-path").get()
+                .response();
+        assertThat(result.payload()).contains("<head><link rel=\"stylesheet\" href=\"css/link\" />\n</head>");
     }
 
     @Test
     public void appendsScriptLinksToHead() throws Exception {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("",
-            "<script src=\"js/link/script.js\" data-rd-options=\"include\" type=\"text/javascript\"></script>"));
+                "<script src=\"js/link/script.js\" data-rd-options=\"include\" type=\"text/javascript\"></script>"));
         final Response<String> result = composer
-            .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"),
-                "template-path")
-            .get().response();
-        assertThat(result.payload()).contains(
-            "<head><script type=\"text/javascript\" src=\"js/link/script.js\" ></script>\n</head>");
+                .composeTemplate(r("<head></head><include path=\"http://mock/\"></include>"), "template-path").get()
+                .response();
+        assertThat(result.payload())
+                .contains("<head><script type=\"text/javascript\" src=\"js/link/script.js\" ></script>\n</head>");
     }
 
     @Test
     public void composesRecursiveTemplate() throws Exception {
         final String innerContent = "some content";
         final TemplateComposer composer = makeComposer(
-            aClientWithConsecutiveContent(
-                "<include path=\"http://other/mock/\"></include>",
-                innerContent));
+                aClientWithConsecutiveContent("<include path=\"http://other/mock/\"></include>", innerContent));
         final Response<String> result = composer
-            .composeTemplate(r("<include path=\"http://mock/\"></include>"), "template-path")
-            .get().response();
+                .composeTemplate(r("<include path=\"http://mock/\"></include>"), "template-path").get().response();
         assertThat(result.payload()).contains(innerContent);
     }
 
@@ -95,25 +88,21 @@ public class TemplateComposerTest {
     public void usesFallbackIfContentReturnsWithError() throws Exception {
         final TemplateComposer composer = makeComposer(aClientReturning(Status.BAD_REQUEST));
         final Response<String> result = composer
-            .composeTemplate(
-                r("template content <include path=\"http://mock/\"><content>"
-                    + "<div>default content</div></content></include>"),
-                "template-path")
-            .get().response();
+                .composeTemplate(r("template content <include path=\"http://mock/\"><content>"
+                        + "<div>default content</div></content></include>"), "template-path")
+                .get().response();
         assertThat(result.payload()).contains("template content <div>default content</div>");
     }
 
     @Test
     public void composesSessionAlongWithTemplates() throws Exception {
-        final TemplateComposer composer =
-            makeComposer(aClientWithSimpleContent("content", "x-rd-session-key-content", "session-val-content"));
+        final TemplateComposer composer = makeComposer(
+                aClientWithSimpleContent("content", "x-rd-session-key-content", "session-val-content"));
 
         final SessionRoot result = composer
-            .composeTemplate(r(
-                "template content <include path=\"http://mock/\"></include> more content")
-                    .withHeader("x-rd-session-key-template", "session-val-template"),
-                "template-path")
-            .get().session();
+                .composeTemplate(r("template content <include path=\"http://mock/\"></include> more content")
+                        .withHeader("x-rd-session-key-template", "session-val-template"), "template-path")
+                .get().extensions().get(SessionRoot.class).get();
 
         assertThat(result.get("session-key-template")).contains("session-val-template");
         assertThat(result.get("session-key-content")).contains("session-val-content");
@@ -125,15 +114,12 @@ public class TemplateComposerTest {
         final int maxRecursion = 1;
         final String fallbackContent = "fallback";
         final TemplateComposer composer = makeComposerWithMaxRecursion(
-            aClientWithConsecutiveContent(
-                "<include path=\"include-exceeding-max-recursion\"><content>"
-                    + fallbackContent + "</content></include>",
-                "inner content should not be present"),
-            maxRecursion);
+                aClientWithConsecutiveContent("<include path=\"include-exceeding-max-recursion\"><content>"
+                        + fallbackContent + "</content></include>", "inner content should not be present"),
+                maxRecursion);
         final Response<String> result = composer
-            .composeTemplate(r("<include path=\"include-in-template\"></include>"),
-                "template-path")
-            .get().response();
+                .composeTemplate(r("<include path=\"include-in-template\"></include>"), "template-path").get()
+                .response();
         assertThat(result.payload()).contains(fallbackContent);
     }
 
@@ -142,10 +128,9 @@ public class TemplateComposerTest {
         final TemplateComposer composer = makeComposer(aClientWithSimpleContent("content"));
 
         final Response<String> result = composer
-            .composeTemplate(r(
-                "template content <include path=\"http://mock/\"></include> more content"),
-                "template-path")
-            .get().response();
+                .composeTemplate(r("template content <include path=\"http://mock/\"></include> more content"),
+                        "template-path")
+                .get().response();
 
         assertThat(result.header("Cache-Control")).contains("no-store,max-age=0");
     }
@@ -156,10 +141,9 @@ public class TemplateComposerTest {
 
         final Client client = aClientWithSimpleContent("content");
         final TemplateComposer composer = makeComposer(client);
-        composer.composeTemplate(r(
-            "template content <include ttl=\"" + ttl + "\" path=\"http://mock/\"></include> more content"),
-            "template-path")
-            .get();
+        composer.composeTemplate(
+                r("template content <include ttl=\"" + ttl + "\" path=\"http://mock/\"></include> more content"),
+                "template-path").get();
 
         verify(client).send(argThat(RequestMatching.with("http://mock/", ttl)));
     }
@@ -177,9 +161,9 @@ public class TemplateComposerTest {
     private TemplateComposer makeComposerWithMaxRecursion(final Client client, final int maxRecursion) {
         final SessionRoot session = SessionRoot.empty();
         return new AttoParserBasedComposer(
-            new ValidatingContentFetcher(client, Collections.emptyMap(), session), session,
-            new ComposerHtmlConfiguration("include", "content", "data-rd-options",
-                maxRecursion));
+                new ValidatingContentFetcher(client, Collections.emptyMap(), Extension.of(asList(session))),
+                Extension.of(Arrays.asList(session)),
+                new ComposerHtmlConfiguration("include", "content", "data-rd-options", maxRecursion));
     }
 
     private Client aClientWithSimpleContent(final String content) {
@@ -196,21 +180,18 @@ public class TemplateComposerTest {
 
     private Client aClientReturning(final Response<ByteString> response) {
         final Client client = mock(Client.class);
-        when(client.send(any()))
-            .thenReturn(completedFuture(response));
+        when(client.send(any())).thenReturn(completedFuture(response));
         return client;
     }
 
     private Client aClientWithConsecutiveContent(final String firstContent, final String... other) {
         final Client client = mock(Client.class);
         @SuppressWarnings("unchecked")
-        final CompletableFuture<Response<ByteString>>[] otherResponses = asList(other)
-            .stream()
-            .map(c -> completedFuture(contentResponse(c, "")))
-            .collect(Collectors.toList()).toArray(new CompletableFuture[0]);
+        final CompletableFuture<Response<ByteString>>[] otherResponses = asList(other).stream()
+                .map(c -> completedFuture(contentResponse(c, ""))).collect(Collectors.toList())
+                .toArray(new CompletableFuture[0]);
 
-        when(client.send(any())).thenReturn(completedFuture(contentResponse(firstContent, "")),
-            otherResponses);
+        when(client.send(any())).thenReturn(completedFuture(contentResponse(firstContent, "")), otherResponses);
         return client;
     }
 
@@ -222,10 +203,9 @@ public class TemplateComposerTest {
 
     private Response<ByteString> contentResponse(final String content, final String head) {
         return Response
-            .forPayload(
-                encodeUtf8("<html><head>" + head + "</head><body><content>" + content
-                    + "</content></body></html>"))
-            .withHeader("Content-Type", "text/html");
+                .forPayload(encodeUtf8(
+                        "<html><head>" + head + "</head><body><content>" + content + "</content></body></html>"))
+                .withHeader("Content-Type", "text/html");
     }
 
     private CompletionStage<Response<ByteString>> statusResponse(final Status status) {

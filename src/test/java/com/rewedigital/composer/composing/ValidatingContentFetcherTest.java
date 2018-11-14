@@ -1,5 +1,6 @@
 package com.rewedigital.composer.composing;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 import static okio.ByteString.encodeUtf8;
@@ -15,13 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
+
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
-import com.rewedigital.composer.composing.CompositionStep;
-import com.rewedigital.composer.composing.FetchContext;
-import com.rewedigital.composer.composing.ValidatingContentFetcher;
 import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.Extension;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -37,7 +37,7 @@ public class ValidatingContentFetcherTest {
     @Test
     public void fetchesEmptyContentForMissingPath() throws Exception {
         final Response<String> result =
-            new ValidatingContentFetcher(mock(Client.class), emptyMap(), emptySession)
+            new ValidatingContentFetcher(mock(Client.class), emptyMap(), extensionsOf(emptySession)) // FIXME: extract creation into factory method
                 .fetch(FetchContext.of(null, null, defaultTimeout), aStep())
                 .get();
         assertThat(result.payload()).contains("");
@@ -48,7 +48,7 @@ public class ValidatingContentFetcherTest {
         final Client client = mock(Client.class);
         when(client.send(aRequestWithPath("/some/path"))).thenReturn(aResponse("ok"));
         final Response<String> result =
-            new ValidatingContentFetcher(client, emptyMap(), emptySession)
+            new ValidatingContentFetcher(client, emptyMap(), extensionsOf(emptySession))
                 .fetch(FetchContext.of("/some/path", "fallback", defaultTimeout), aStep())
                 .get();
         assertThat(result.payload()).contains("ok");
@@ -59,7 +59,7 @@ public class ValidatingContentFetcherTest {
         final Client client = mock(Client.class);
         when(client.send(aRequestWithPath("/some/path/val"))).thenReturn(aResponse("ok"));
         final Response<String> result =
-            new ValidatingContentFetcher(client, params("var", "val"), emptySession)
+            new ValidatingContentFetcher(client, params("var", "val"), extensionsOf(emptySession))
                 .fetch(FetchContext.of("/some/path/{var}", "fallback", defaultTimeout), aStep())
                 .get();
         assertThat(result.payload()).contains("ok");
@@ -70,7 +70,7 @@ public class ValidatingContentFetcherTest {
         final Client client = mock(Client.class);
         when(client.send(aRequestWithPath("/some/path"))).thenReturn(aResponse("ok", "text/json"));
         final Response<String> result =
-            new ValidatingContentFetcher(client, emptyMap(), emptySession)
+            new ValidatingContentFetcher(client, emptyMap(), extensionsOf(emptySession))
                 .fetch(FetchContext.of("/some/path", "", defaultTimeout), aStep())
                 .get();
         assertThat(result.payload()).contains("");
@@ -81,7 +81,7 @@ public class ValidatingContentFetcherTest {
         final Client client = mock(Client.class);
         when(client.send(any())).thenReturn(aResponse(""));
         final SessionRoot session = session("x-rd-key", "value");
-        new ValidatingContentFetcher(client, emptyMap(), session)
+        new ValidatingContentFetcher(client, emptyMap(), extensionsOf(session))
             .fetch(FetchContext.of("/some/path", "", defaultTimeout), aStep())
             .get();
         verify(client).send(aRequestWithSession("x-rd-key", "value"));
@@ -92,7 +92,7 @@ public class ValidatingContentFetcherTest {
         final StubClient client = aStubClient();
         final Optional<Duration> timeout = Optional.of(Duration.ofMillis(200));
 
-        new ValidatingContentFetcher(client, emptyMap(), emptySession)
+        new ValidatingContentFetcher(client, emptyMap(), extensionsOf(emptySession))
             .fetch(FetchContext.of("path", "fallback", timeout), aStep())
             .get();
 
@@ -154,5 +154,9 @@ public class ValidatingContentFetcherTest {
         final Map<String, T> params = new HashMap<>();
         params.put(name, value);
         return params;
+    }
+    
+    private static Extension extensionsOf(final SessionRoot session) {
+        return Extension.of(asList(session));
     }
 }

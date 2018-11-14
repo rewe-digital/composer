@@ -22,11 +22,11 @@ import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.routing.SessionAwareProxyClient;
-import com.rewedigital.composer.session.ResponseWithSession;
+import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.session.SessionHandler;
 import com.rewedigital.composer.session.SessionHandlerFactory;
 import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.ExtendableResponse;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -97,15 +97,15 @@ public class ComposingRequestHandlerTest {
         return () -> SessionHandler.noSession();
     }
 
-    private static class RoutingResult extends SessionAwareProxyClient {
+    private static class RoutingResult extends ExtensionAwareRequestClient {
 
         public static RouteTypes returning(final Status status, final String responseBody) {
-            return new RouteTypes(composerFactory(), new SessionAwareProxyClient() {
+            return new RouteTypes(composerFactory(), new ExtensionAwareRequestClient() {
                 @Override
-                public CompletionStage<ResponseWithSession<ByteString>> fetch(final RouteMatch rm,
+                public CompletionStage<ExtendableResponse<ByteString>> fetch(final RouteMatch rm,
                     final RequestContext context, final SessionRoot session) {
                     return CompletableFuture.completedFuture(
-                        new ResponseWithSession<>(Response.of(status, ByteString.encodeUtf8(responseBody)), session));
+                        new ExtendableResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), session));
                 }
             });
         }
