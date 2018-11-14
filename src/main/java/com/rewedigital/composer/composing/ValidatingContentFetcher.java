@@ -13,6 +13,7 @@ import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
+import com.spotify.apollo.StatusType.Family;
 
 import okio.ByteString;
 
@@ -41,8 +42,11 @@ public class ValidatingContentFetcher implements ContentFetcher {
         final String expandedPath = UriTemplate.fromTemplate(context.path()).expand(parsedPathArguments);
         final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
 
-        return client.send(request).thenApply(response -> acceptHtmlOnly(response, expandedPath))
-            .thenApply(r -> toStringPayload(r, context.fallback())).toCompletableFuture();
+        return client.send(request)
+            .thenApply(response -> acceptHtmlOnly(response, expandedPath))
+            .thenApply(response -> acceptOkStatusOnly(response, expandedPath))
+            .thenApply(r -> toStringPayload(r, context.fallback()))
+            .toCompletableFuture();
     }
 
     private Request withTtl(final Request request, final FetchContext context) {
@@ -60,6 +64,13 @@ public class ValidatingContentFetcher implements ContentFetcher {
             return response;
         }
         LOGGER.warn("Content-Type of [{}] is not text/html, returning an empty body.", expandedPath);
+        return response.withPayload(null);
+    }
+
+    private Response<ByteString> acceptOkStatusOnly(final Response<ByteString> response, final String expandedPath) {
+        if (response.status().family().equals(Family.SUCCESSFUL)) {
+            return response;
+        }
         return response.withPayload(null);
     }
 }

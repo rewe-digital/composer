@@ -23,6 +23,7 @@
         <code-assert.version>0.8.5</code-assert.version>
         <mockwebserver.version>2.5.0</mockwebserver.version>
         <guava-testlib.version>23.6-jre</guava-testlib.version>
+
     </properties>
 
     <dependencies>

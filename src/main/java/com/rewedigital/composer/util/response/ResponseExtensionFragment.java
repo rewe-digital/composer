@@ -48,13 +48,4 @@ public class ResponseExtensionFragment implements Mergables {
 
         return new ResponseExtensionFragment(mergedExtensions);
     }
-
-    public ResponseExtensionFragment with(final Mergable<?> extension) {
-        return mergedWith(new ResponseExtensionFragment(asList(extension)));
-    }
-
-    @Override
-    public String toString() {
-        return "ExtensionFragment: " + extensions;
-    }
 }
