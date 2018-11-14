@@ -1,7 +1,5 @@
 package com.rewedigital.composer.util.response;
 
-import static java.util.Arrays.asList;
-
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -9,19 +7,14 @@ import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Response;
 
 /**
- * Holds a response with payload of type <code>T</code> and extending data via an {@link Extension}.
+ * Holds a response with payload of type <code>T</code> and extending data via an {@link ResponseExtension}.
  */
 public class ExtendableResponse<T> {
 
     private final Response<T> response;
-    private final Extension extension;
+    private final ResponseExtension extension;
 
-    // FIXME
-    public ExtendableResponse(final Response<T> response, final SessionRoot session) {
-        this(response, Extension.of(asList(session)));
-    }
-
-    public ExtendableResponse(final Response<T> response, final Extension extension) {
+    public ExtendableResponse(final Response<T> response, final ResponseExtension extension) {
         this.response = Objects.requireNonNull(response);
         this.extension = Objects.requireNonNull(extension);
     }
@@ -30,7 +23,7 @@ public class ExtendableResponse<T> {
         return response;
     }
 
-    public Extension extensions() {
+    public ResponseExtension extensions() {
         return extension;
     }
 
@@ -39,7 +32,7 @@ public class ExtendableResponse<T> {
     }
 
     // FIXME
-    public Response<T> writeSessionToResponse(final SessionRoot.Serializer serializer) {
-        return extension.get(SessionRoot.class).get().writeTo(response, serializer);
+    public Response<T> writeSessionToResponse() {
+        return extension.get(SessionRoot.class).map(s -> s.writeTo(response)).orElse(response);
     }
 }

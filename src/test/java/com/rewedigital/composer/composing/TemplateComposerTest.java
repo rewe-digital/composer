@@ -21,7 +21,7 @@ import org.junit.Test;
 
 import com.rewedigital.composer.helper.RequestMatching;
 import com.rewedigital.composer.session.SessionRoot;
-import com.rewedigital.composer.util.response.Extension;
+import com.rewedigital.composer.util.response.ResponseExtension;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
@@ -161,8 +161,8 @@ public class TemplateComposerTest {
     private TemplateComposer makeComposerWithMaxRecursion(final Client client, final int maxRecursion) {
         final SessionRoot session = SessionRoot.empty();
         return new AttoParserBasedComposer(
-                new ValidatingContentFetcher(client, Collections.emptyMap(), Extension.of(asList(session))),
-                Extension.of(Arrays.asList(session)),
+                new ValidatingContentFetcher(client, Collections.emptyMap(), ResponseExtension.of(asList(session))),
+                ResponseExtension.of(Arrays.asList(session)),
                 new ComposerHtmlConfiguration("include", "content", "data-rd-options", maxRecursion));
     }
 

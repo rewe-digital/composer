@@ -29,7 +29,7 @@ public class CookieBasedSessionHandlerTest {
     @Test
     public void shouldWriteAndReadCookie() throws Exception {
         final String cookieHeader =
-            dirtySessionRoot("x-rd-key", "value").writeTo(Response.ok(), sessionHandler()).header("Set-Cookie").get();
+            dirtySessionRoot("x-rd-key", "value", sessionHandler()).writeTo(Response.ok()).header("Set-Cookie").get();
         final SessionRoot session =
             sessionHandler().initialize(contextFor(Request.forUri("/").withHeader("Cookie", cookieHeader)))
                 .toCompletableFuture().get();
@@ -46,7 +46,7 @@ public class CookieBasedSessionHandlerTest {
     @Test
     public void shouldNotWriteSessionCookieIfSessionIsNotDirty() {
         final Optional<String> setCookieHeader =
-            cleanSessionRoot("x-rd-key", "value").writeTo(Response.ok(), sessionHandler()).header("Set-Cookie");
+            cleanSessionRoot("x-rd-key", "value", sessionHandler()).writeTo(Response.ok()).header("Set-Cookie");
         assertThat(setCookieHeader).isEmpty();
     }
 
@@ -73,7 +73,8 @@ public class CookieBasedSessionHandlerTest {
     }
 
     private SessionConfiguration configuration() {
-        return new SessionConfiguration(true, "sessioncookie", SignatureAlgorithm.HS512.getValue(), "123", Collections.emptyList());
+        return new SessionConfiguration(true, "sessioncookie", SignatureAlgorithm.HS512.getValue(), "123",
+            Collections.emptyList());
     }
 
     private Config enabledConfig() {

@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.util.response.ExtendableResponse;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -67,10 +66,6 @@ public abstract class SessionHandler implements SessionRoot.Serializer {
     public CompletionStage<SessionRoot> initialize(final RequestContext context) {
         final SessionRoot session = obtainSession(context.request());
         return runInterceptors(session, context);
-    }
-
-    public <T> Response<T> store(final ExtendableResponse<T> response) {
-        return response.writeSessionToResponse(this);
     }
 
     protected abstract SessionRoot obtainSession(Request request);

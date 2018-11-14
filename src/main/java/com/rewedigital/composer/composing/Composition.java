@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import com.rewedigital.composer.util.response.ExtensionFragment;
+import com.rewedigital.composer.util.response.ResponseExtensionFragment;
 
 /**
  * Contains the data of a (partial) composition.
@@ -36,7 +36,7 @@ class Composition {
 
     @FunctionalInterface
     public interface Extractor<T> {
-        public T extract(String body, ExtensionFragment extension);
+        public T extract(String body, ResponseExtensionFragment extension);
     }
 
     private final List<Composition> children;
@@ -45,17 +45,17 @@ class Composition {
     private final int endOffset;
     private final String template;
     private final ContentRange contentRange;
-    private final ExtensionFragment extension;
+    private final ResponseExtensionFragment extension;
 
     private Composition(final String template, final ContentRange contentRange, final List<Asset> assets,
             final List<Composition> children) {
-        this(0, template.length(), template, contentRange, assets, ExtensionFragment.empty(),
+        this(0, template.length(), template, contentRange, assets, ResponseExtensionFragment.empty(),
                 children);
     }
 
     private Composition(final int startOffset, final int endOffset, final String template,
             final ContentRange contentRange, final List<Asset> assets, 
-            final ExtensionFragment extension, final List<Composition> children) {
+            final ResponseExtensionFragment extension, final List<Composition> children) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.template = template;
@@ -69,7 +69,7 @@ class Composition {
         return new Composition(startOffset, endOffset, template, contentRange, assets, extension, children);
     }
 
-    public Composition withExtension(ExtensionFragment extensionFragment) {
+    public Composition withExtension(ResponseExtensionFragment extensionFragment) {
         return new Composition(startOffset, endOffset, template, contentRange, assets,
                 extension.mergedWith(extensionFragment), children);
     }
@@ -96,8 +96,8 @@ class Composition {
         return writer.toString();
     }
 
-    private ExtensionFragment mergedExtensions() {
-        return extension.mergedWith(children.stream().reduce(ExtensionFragment.empty(),
+    private ResponseExtensionFragment mergedExtensions() {
+        return extension.mergedWith(children.stream().reduce(ResponseExtensionFragment.empty(),
                 (f, c) -> f.mergedWith(c.mergedExtensions()), (a, b) -> a.mergedWith(b)));
     }
 

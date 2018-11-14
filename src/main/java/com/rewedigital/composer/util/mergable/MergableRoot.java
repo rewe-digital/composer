@@ -2,9 +2,13 @@ package com.rewedigital.composer.util.mergable;
 
 import java.util.Optional;
 
+import com.spotify.apollo.Response;
+
 public interface MergableRoot<T extends Mergable<T>> {
 
     public MergableRoot<T> mergedWith(T mergable);
+
+    public T mergableFor(final Response<?> response);
 
     public Class<T> mergableType();
 

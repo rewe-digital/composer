@@ -48,7 +48,7 @@ public class SessionHandlerTest {
             public CompletionStage<SessionRoot> afterCreation(final SessionRoot session, final RequestContext context) {
                 final Map<String, String> data = session.rawData();
                 data.put(key, value);
-                return CompletableFuture.completedFuture(SessionRoot.of(data));
+                return CompletableFuture.completedFuture(SessionRoot.of(session.serializer(), data));
             }
         };
     }

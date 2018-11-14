@@ -8,6 +8,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
@@ -16,17 +17,15 @@ import org.junit.Test;
 
 import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.configuration.DefaultConfiguration;
-import com.rewedigital.composer.proxy.ComposingRequestHandler;
 import com.rewedigital.composer.routing.BackendRouting;
+import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
-import com.rewedigital.composer.session.SessionHandler;
-import com.rewedigital.composer.session.SessionHandlerFactory;
-import com.rewedigital.composer.session.SessionRoot;
 import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseExtensionHandler;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -93,8 +92,15 @@ public class ComposingRequestHandlerTest {
         return context;
     }
 
-    private SessionHandlerFactory sessionSerializer() {
-        return () -> SessionHandler.noSession();
+    private ResponseExtensionHandler sessionSerializer() {
+        return new ResponseExtensionHandler() {
+
+            @Override
+            public CompletionStage<ResponseExtension> initialize(RequestContext context) {
+                return CompletableFuture.completedFuture(ResponseExtension.of(Collections.emptyList()));
+            }
+        };
+
     }
 
     private static class RoutingResult extends ExtensionAwareRequestClient {
@@ -103,9 +109,9 @@ public class ComposingRequestHandlerTest {
             return new RouteTypes(composerFactory(), new ExtensionAwareRequestClient() {
                 @Override
                 public CompletionStage<ExtendableResponse<ByteString>> fetch(final RouteMatch rm,
-                    final RequestContext context, final SessionRoot session) {
+                    final RequestContext context, final ResponseExtension extension) {
                     return CompletableFuture.completedFuture(
-                        new ExtendableResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), session));
+                        new ExtendableResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
                 }
             });
         }

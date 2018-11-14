@@ -20,8 +20,9 @@ import java.util.concurrent.CompletionStage;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
+import com.rewedigital.composer.helper.Sessions;
 import com.rewedigital.composer.session.SessionRoot;
-import com.rewedigital.composer.util.response.Extension;
+import com.rewedigital.composer.util.response.ResponseExtension;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -36,21 +37,23 @@ public class ValidatingContentFetcherTest {
 
     @Test
     public void fetchesEmptyContentForMissingPath() throws Exception {
-        final Response<String> result =
-            new ValidatingContentFetcher(mock(Client.class), emptyMap(), extensionsOf(emptySession)) // FIXME: extract creation into factory method
-                .fetch(FetchContext.of(null, null, defaultTimeout), aStep())
-                .get();
+        final Response<String> result = fetch(mock(Client.class), emptyMap(), extensionsOf(emptySession),
+            FetchContext.of(null, null, defaultTimeout), aStep());
+
         assertThat(result.payload()).contains("");
+    }
+
+    private Response<String> fetch(Client client, Map<String, Object> pathArgs, ResponseExtension extensions,
+        FetchContext context, CompositionStep step) throws Exception {
+        return new ValidatingContentFetcher(client, pathArgs, extensions).fetch(context, step).get();
     }
 
     @Test
     public void fetchesContentFromPath() throws Exception {
         final Client client = mock(Client.class);
         when(client.send(aRequestWithPath("/some/path"))).thenReturn(aResponse("ok"));
-        final Response<String> result =
-            new ValidatingContentFetcher(client, emptyMap(), extensionsOf(emptySession))
-                .fetch(FetchContext.of("/some/path", "fallback", defaultTimeout), aStep())
-                .get();
+        final Response<String> result = fetch(client, emptyMap(), extensionsOf(emptySession),
+            FetchContext.of("/some/path", "fallback", defaultTimeout), aStep());
         assertThat(result.payload()).contains("ok");
     }
 
@@ -58,10 +61,8 @@ public class ValidatingContentFetcherTest {
     public void expandsPathWithParameters() throws Exception {
         final Client client = mock(Client.class);
         when(client.send(aRequestWithPath("/some/path/val"))).thenReturn(aResponse("ok"));
-        final Response<String> result =
-            new ValidatingContentFetcher(client, params("var", "val"), extensionsOf(emptySession))
-                .fetch(FetchContext.of("/some/path/{var}", "fallback", defaultTimeout), aStep())
-                .get();
+        final Response<String> result = fetch(client, params("var", "val"), extensionsOf(emptySession),
+            FetchContext.of("/some/path/{var}", "fallback", defaultTimeout), aStep());
         assertThat(result.payload()).contains("ok");
     }
 
@@ -147,7 +148,7 @@ public class ValidatingContentFetcherTest {
     }
 
     private static SessionRoot session(final String key, final String value) {
-        return SessionRoot.of(params(key, value));
+        return Sessions.cleanSessionRoot(key, value);
     }
 
     private static <T> Map<String, T> params(final String name, final T value) {
@@ -155,8 +156,8 @@ public class ValidatingContentFetcherTest {
         params.put(name, value);
         return params;
     }
-    
-    private static Extension extensionsOf(final SessionRoot session) {
-        return Extension.of(asList(session));
+
+    private static ResponseExtension extensionsOf(final SessionRoot session) {
+        return ResponseExtension.of(asList(session));
     }
 }

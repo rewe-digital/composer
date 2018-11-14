@@ -25,7 +25,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
     private final RequestEnricher requestEnricher;
 
     public ValidatingContentFetcher(final Client client, final Map<String, Object> parsedPathArguments,
-            final RequestEnricher requestEnricher) {
+        final RequestEnricher requestEnricher) {
         this.requestEnricher = requireNonNull(requestEnricher);
         this.client = requireNonNull(client);
         this.parsedPathArguments = requireNonNull(parsedPathArguments);
@@ -42,7 +42,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
         final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
 
         return client.send(request).thenApply(response -> acceptHtmlOnly(response, expandedPath))
-                .thenApply(r -> toStringPayload(r, context.fallback())).toCompletableFuture();
+            .thenApply(r -> toStringPayload(r, context.fallback())).toCompletableFuture();
     }
 
     private Request withTtl(final Request request, final FetchContext context) {

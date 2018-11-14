@@ -10,17 +10,17 @@ import java.util.Optional;
 import com.rewedigital.composer.util.mergable.Mergable;
 import com.rewedigital.composer.util.mergable.Mergables;
 
-public class ExtensionFragment implements Mergables {
+public class ResponseExtensionFragment implements Mergables {
 
-    private static final ExtensionFragment empty = new ExtensionFragment(Collections.emptyList());
+    private static final ResponseExtensionFragment empty = new ResponseExtensionFragment(Collections.emptyList());
     
     private final List<Mergable<?>> extensions;
 
-    ExtensionFragment(final List<Mergable<?>> extensions) {
+    ResponseExtensionFragment(final List<Mergable<?>> extensions) {
         this.extensions = new LinkedList<>(extensions);
     }
 
-    public static ExtensionFragment empty() {
+    public static ResponseExtensionFragment empty() {
         return empty;
     }
 
@@ -34,7 +34,7 @@ public class ExtensionFragment implements Mergables {
         return Optional.empty();
     }
 
-    public ExtensionFragment mergedWith(final ExtensionFragment other) {
+    public ResponseExtensionFragment mergedWith(final ResponseExtensionFragment other) {
         List<Mergable<?>> mergedExtensions = new LinkedList<>();
         for (Mergable<?> entry : extensions) {
             mergedExtensions.add(entry.mergedFrom(other));
@@ -46,11 +46,11 @@ public class ExtensionFragment implements Mergables {
             }
         }
 
-        return new ExtensionFragment(mergedExtensions);
+        return new ResponseExtensionFragment(mergedExtensions);
     }
 
-    public ExtensionFragment with(final Mergable<?> extension) {
-        return mergedWith(new ExtensionFragment(asList(extension)));
+    public ResponseExtensionFragment with(final Mergable<?> extension) {
+        return mergedWith(new ResponseExtensionFragment(asList(extension)));
     }
 
     @Override

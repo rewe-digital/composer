@@ -1,42 +1,39 @@
 package com.rewedigital.composer.util.response;
 
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.rewedigital.composer.session.SessionFragment;
 import com.rewedigital.composer.util.mergable.MergableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
-public class Extension implements RequestEnricher {
+public class ResponseExtension implements RequestEnricher {
 
     // FIXME allow only on instance per type!
     private final List<MergableRoot<?>> roots;
 
-    private Extension(final List<MergableRoot<?>> roots) {
+    private ResponseExtension(final List<MergableRoot<?>> roots) {
         this.roots = new LinkedList<>(roots);
     }
 
-    public static Extension of(final List<MergableRoot<?>> roots) {
-        return new Extension(roots);
+    public static ResponseExtension of(final List<MergableRoot<?>> roots) {
+        return new ResponseExtension(roots);
     }
 
-    public Extension mergedWithFragmentFor(final Response<?> response) {
+    public ResponseExtension mergedWithFragmentFor(final Response<?> response) {
         return this.mergedWith(fragmentFor(response));
     }
 
-    public ExtensionFragment fragmentFor(final Response<?> response) {
-        SessionFragment sessionFragment = SessionFragment.of(response); // FIXME get rid of hard dependency
-        return new ExtensionFragment(asList(sessionFragment));
+    public ResponseExtensionFragment fragmentFor(final Response<?> response) {
+        return new ResponseExtensionFragment(roots.stream().map(r -> r.mergableFor(response)).collect(toList()));
     }
 
-    public Extension mergedWith(final ExtensionFragment fragment) {
-        return Extension.of(roots.stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
+    public ResponseExtension mergedWith(final ResponseExtensionFragment fragment) {
+        return ResponseExtension.of(roots.stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
     }
 
     @SuppressWarnings("unchecked")
