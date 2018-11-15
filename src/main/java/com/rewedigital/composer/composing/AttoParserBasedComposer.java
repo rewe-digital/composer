@@ -5,51 +5,50 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CompletableFuture;
 
 import com.rewedigital.composer.parser.Parser;
-import com.rewedigital.composer.session.ResponseWithSession;
-import com.rewedigital.composer.session.SessionFragment;
-import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ResponseExtension;
 import com.spotify.apollo.Response;
 
 /**
- * Implements the composer interfaces using the <code>atto parser</code> to parse html documents to identify include and
- * content tags.
+ * Implements the composer interfaces using the <code>atto parser</code> to parse html documents to identify include and content tags.
  */
 public class AttoParserBasedComposer implements ContentComposer, TemplateComposer {
 
     private final ContentFetcher contentFetcher;
     private final ComposerHtmlConfiguration configuration;
-    private final SessionRoot session;
+    private final ResponseExtension extension;
 
-    public AttoParserBasedComposer(final ContentFetcher contentFetcher, final SessionRoot session,
-        final ComposerHtmlConfiguration configuration) {
+    public AttoParserBasedComposer(final ContentFetcher contentFetcher,  final ResponseExtension extension,
+            final ComposerHtmlConfiguration configuration) {
         this.configuration = requireNonNull(configuration);
-        this.contentFetcher =
-            new RecursionAwareContentFetcher(requireNonNull(contentFetcher), configuration.maxRecursion());
-        this.session = requireNonNull(session);
+        this.contentFetcher = new RecursionAwareContentFetcher(requireNonNull(contentFetcher),
+                configuration.maxRecursion());
+
+        this.extension = requireNonNull(extension);
     }
 
     @Override
-    public CompletableFuture<ResponseWithSession<String>> composeTemplate(final Response<String> templateResponse,
-        final String templatePath) {
+    public CompletableFuture<ExtendableResponse<String>> composeTemplate(final Response<String> templateResponse,
+            final String templatePath) {
         return parse(bodyOf(templateResponse), ContentRange.allUpToo(bodyOf(templateResponse).length()))
-            .composeIncludes(contentFetcher, this, CompositionStep.root(templatePath))
-            .thenApply(c -> c.withSession(SessionFragment.of(templateResponse)))
-            .thenApply(c -> c.extract(response()))
-            // temporary solution: correct cache-control header should be computed during composition
-            .thenApply(r -> r.transform(response -> response.withHeader("Cache-Control", "no-store,max-age=0")));
+                .composeIncludes(contentFetcher, this, CompositionStep.root(templatePath))
+                .thenApply(c -> c.withExtension(extension.fragmentFor(templateResponse)))
+                .thenApply(c -> c.extract(response()))
+                // temporary solution: correct cache-control header should be computed during
+                // composition
+                .thenApply(r -> r.transform(response -> response.withHeader("Cache-Control", "no-store,max-age=0")));
     }
 
-    private Composition.Extractor<ResponseWithSession<String>> response() {
-        return (payload, sessionFragment) -> new ResponseWithSession<String>(Response.forPayload(payload),
-            session.mergedWith(sessionFragment));
+    private Composition.Extractor<ExtendableResponse<String>> response() {
+        return (payload, extensionFragment) -> new ExtendableResponse<String>(Response.forPayload(payload), 
+                extension.mergedWith(extensionFragment));
     }
 
     @Override
     public CompletableFuture<Composition> composeContent(final Response<String> contentResponse,
-        final CompositionStep step) {
-        return parse(bodyOf(contentResponse), ContentRange.empty())
-            .composeIncludes(contentFetcher, this, step)
-            .thenApply(c -> c.withSession(SessionFragment.of(contentResponse)));
+            final CompositionStep step) {
+        return parse(bodyOf(contentResponse), ContentRange.empty()).composeIncludes(contentFetcher, this, step)
+                .thenApply(c -> c.withExtension(extension.fragmentFor(contentResponse)));
     }
 
     private IncludeProcessor parse(final String template, final ContentRange defaultContentRange) {

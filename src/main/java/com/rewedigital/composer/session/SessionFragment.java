@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.rewedigital.composer.util.mergable.Mergable;
 import com.spotify.apollo.Response;
 
 /**
- * Describes a fragment of a session that is constructed from http headers of a (template or content) response. Session
- * fragments can be merged to construct a combined fragment.
+ * Describes a fragment of a session that is constructed from http headers of a
+ * (template or content) response. Session fragments can be merged to construct
+ * a combined fragment.
  */
-public class SessionFragment {
+ public class SessionFragment implements Mergable<SessionFragment> {
 
     private static final SessionFragment emptySession = new SessionFragment(new HashMap<>());
 
@@ -32,10 +34,8 @@ public class SessionFragment {
     }
 
     public static <T> SessionFragment of(final Response<T> response) {
-        final List<Map.Entry<String, String>> data = response.headerEntries()
-            .stream()
-            .filter(SessionData::isSessionEntry)
-            .collect(toList());
+        final List<Map.Entry<String, String>> data = response.headerEntries().stream()
+                .filter(SessionData::isSessionEntry).collect(toList());
         return new SessionFragment(toMap(data));
     }
 

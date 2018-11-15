@@ -10,23 +10,17 @@ import java.util.Optional;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
-import com.rewedigital.composer.routing.BackendRouting;
-import com.rewedigital.composer.routing.Match;
-import com.rewedigital.composer.routing.RouteMatch;
-import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.route.Rule;
 
 public class BackendRoutingTest {
-
-    private final SessionRoot emptySession = SessionRoot.empty();
 
     @Test
     public void findsRouteForSimpleRule() {
         final Rule<Match> simpleRule = Rule.fromUri("/", "GET", Match.of("http://test.com/", PROXY));
         final BackendRouting backendRouting = new BackendRouting(ImmutableList.of(simpleRule));
 
-        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("GET", "/"), emptySession);
+        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("GET", "/"));
         assertThat(matchResult).isPresent();
         assertThat(matchResult.get().backend()).isEqualTo("http://test.com/");
     }
@@ -37,7 +31,7 @@ public class BackendRoutingTest {
             Rule.fromUri("/<someValue>", "GET", Match.of("http://test.com/{someValue}", PROXY));
         final BackendRouting backendRouting = new BackendRouting(ImmutableList.of(ruleWithPath));
 
-        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("GET", "/123"), emptySession);
+        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("GET", "/123"));
         assertThat(matchResult).isPresent();
         assertThat(matchResult.get().backend()).isEqualTo("http://test.com/{someValue}");
         assertThat(matchResult.get().parsedPathArguments()).containsEntry("someValue", "123");
@@ -48,7 +42,7 @@ public class BackendRoutingTest {
         final Rule<Match> simpleRule = Rule.fromUri("/", "GET", Match.of("http://test.com/", PROXY));
         final BackendRouting backendRouting = new BackendRouting(ImmutableList.of(simpleRule));
 
-        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("PUT", "/"), emptySession);
+        final Optional<RouteMatch> matchResult = backendRouting.matches(requestFor("PUT", "/"));
         assertThat(matchResult).isNotPresent();
     }
 

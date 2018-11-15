@@ -71,7 +71,7 @@ public class CookieBasedSessionHandler extends SessionHandler {
 
     @Override
     protected SessionRoot obtainSession(final Request request) {
-        return SessionRoot.of(readFrom(request));
+        return SessionRoot.of(this, readFrom(request));
     }
 
     private Map<String, String> readFrom(final Request request) {

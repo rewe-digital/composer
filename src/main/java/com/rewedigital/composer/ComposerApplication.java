@@ -9,13 +9,8 @@ import java.util.function.BiFunction;
 import com.rewedigital.composer.caching.HttpCacheModule;
 import com.rewedigital.composer.client.ErrorHandlingClientDecoratingModule;
 import com.rewedigital.composer.client.WithIncomingHeadersClientDecoratingModule;
-import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.proxy.ComposingRequestHandler;
 import com.rewedigital.composer.proxy.ProxyHeaderMiddleware;
-import com.rewedigital.composer.routing.BackendRouting;
-import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.routing.SessionAwareProxyClient;
-import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.spotify.apollo.AppInit;
 import com.spotify.apollo.Environment;
 import com.spotify.apollo.core.Service;
@@ -55,22 +50,17 @@ public class ComposerApplication {
             HttpCacheModule.create());
     }
 
-    private static class Initializer {
+       private static class Initializer {
 
         static void init(final Environment environment) {
             final Config configuration = withDefaults(environment.config());
 
-            final ComposingRequestHandler handler =
-                new ComposingRequestHandler(
-                    new BackendRouting(configuration.getConfig("composer.routing")),
-                    new RouteTypes(
-                        new ComposerFactory(configuration.getConfig("composer.html")),
-                        new SessionAwareProxyClient()),
-                    new CookieBasedSessionHandler.Factory(configuration.getConfig("composer.session")));
+            final ComposingRequestHandler handler = RequestHandlerFactory.createRequestHandler(configuration);
 
             registerRoutes(environment, handler, "/");
             registerRoutes(environment, handler, "/<path:path>");
         }
+
 
         private static void registerRoutes(final Environment environment, final ComposingRequestHandler handler,
             final String uri) {

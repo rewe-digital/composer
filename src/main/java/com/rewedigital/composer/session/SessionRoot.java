@@ -2,8 +2,11 @@ package com.rewedigital.composer.session;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
+import com.rewedigital.composer.util.mergable.MergableRoot;
+import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
@@ -15,24 +18,33 @@ import com.spotify.apollo.Response;
  * A root session can be written to a response using an instance of a {@link SessionRoot.Serializer}.
  *
  */
-public class SessionRoot {
+public class SessionRoot implements MergableRoot<SessionFragment>, RequestEnricher {
 
     public interface Serializer {
         <T> Response<T> writeTo(final Response<T> response, final Map<String, String> sessionData, boolean dirty);
     }
 
+    private static final Serializer noopSerializer = new Serializer() {
+        @Override
+        public <T> Response<T> writeTo(Response<T> response, Map<String, String> sessionData, boolean dirty) {
+            return response;
+        }
+    };
+
     private static final String sessionIdKey = "session-id";
-    private static final SessionRoot emptySession = new SessionRoot(new HashMap<>(), false);
+    private static final SessionRoot emptySession = new SessionRoot(noopSerializer, new HashMap<>(), false);
 
     private final SessionData data;
     private final boolean dirty;
+    private final Serializer serializer;
 
-    private SessionRoot(final Map<String, String> data, final boolean dirty) {
-        this(new SessionData(data), dirty);
+    private SessionRoot(final Serializer serializer, final Map<String, String> data, final boolean dirty) {
+        this(serializer, new SessionData(data), dirty);
     }
 
-    private SessionRoot(final SessionData data, final boolean dirty) {
-        this.data = data;
+    private SessionRoot(final Serializer serializer, final SessionData data, final boolean dirty) {
+        this.serializer = Objects.requireNonNull(serializer);
+        this.data = Objects.requireNonNull(data);
         this.dirty = dirty;
     }
 
@@ -40,12 +52,12 @@ public class SessionRoot {
         return emptySession;
     }
 
-    public static SessionRoot of(final Map<String, String> data) {
-        return of(data, false);
+    public static SessionRoot of(final Serializer serializer, final Map<String, String> data) {
+        return of(serializer, data, false);
     }
 
-    public static SessionRoot of(final Map<String, String> data, final boolean dirty) {
-        return new SessionRoot(data, dirty);
+    public static SessionRoot of(final Serializer serializer, final Map<String, String> data, final boolean dirty) {
+        return new SessionRoot(serializer, data, dirty);
     }
 
     public Request enrich(final Request request) {
@@ -60,7 +72,7 @@ public class SessionRoot {
         return get(sessionIdKey);
     }
 
-    public <T> Response<T> writeTo(final Response<T> response, final Serializer serializer) {
+    public <T> Response<T> writtenTo(final Response<T> response) {
         return serializer.writeTo(response, asHeaders(), dirty);
     }
 
@@ -68,11 +80,11 @@ public class SessionRoot {
         final SessionData mergedData = data.mergedWith(other.data);
         final SessionData newData = getId().map(id -> mergedData.with(sessionIdKey, id)).orElse(mergedData);
         final boolean newDirty = !data.equals(newData);
-        return new SessionRoot(newData, newDirty || dirty);
+        return new SessionRoot(serializer, newData, newDirty || dirty);
     }
 
     public SessionRoot withId(final String sessionId) {
-        return new SessionRoot(data.with(sessionIdKey, sessionId), true);
+        return new SessionRoot(serializer, data.with(sessionIdKey, sessionId), true);
     }
 
     public boolean isDirty() {
@@ -85,6 +97,20 @@ public class SessionRoot {
 
     public SessionData data() {
         return data;
+    }
+
+    @Override
+    public Class<SessionFragment> mergableType() {
+        return SessionFragment.class;
+    }
+
+    @Override
+    public SessionFragment mergableFor(Response<?> response) {
+        return SessionFragment.of(response);
+    }
+
+    public Serializer serializer() {
+        return this.serializer;
     }
 
     private Map<String, String> asHeaders() {

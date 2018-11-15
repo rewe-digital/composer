@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.damnhandy.uri.template.UriTemplate;
-import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -23,11 +23,11 @@ public class ValidatingContentFetcher implements ContentFetcher {
 
     private final Client client;
     private final Map<String, Object> parsedPathArguments;
-    private final SessionRoot session;
+    private final RequestEnricher requestEnricher;
 
     public ValidatingContentFetcher(final Client client, final Map<String, Object> parsedPathArguments,
-        final SessionRoot session) {
-        this.session = requireNonNull(session);
+        final RequestEnricher requestEnricher) {
+        this.requestEnricher = requireNonNull(requestEnricher);
         this.client = requireNonNull(client);
         this.parsedPathArguments = requireNonNull(parsedPathArguments);
     }
@@ -40,7 +40,7 @@ public class ValidatingContentFetcher implements ContentFetcher {
         }
 
         final String expandedPath = UriTemplate.fromTemplate(context.path()).expand(parsedPathArguments);
-        final Request request = session.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
+        final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
 
         return client.send(request)
             .thenApply(response -> acceptHtmlOnly(response, expandedPath))
@@ -66,11 +66,11 @@ public class ValidatingContentFetcher implements ContentFetcher {
         LOGGER.warn("Content-Type of [{}] is not text/html, returning an empty body.", expandedPath);
         return response.withPayload(null);
     }
-    
+
     private Response<ByteString> acceptOkStatusOnly(final Response<ByteString> response, final String expandedPath) {
-    	if(response.status().family().equals(Family.SUCCESSFUL)) {
-    		return response;
-    	}
-    	return response.withPayload(null);
+        if (response.status().family().equals(Family.SUCCESSFUL)) {
+            return response;
+        }
+        return response.withPayload(null);
     }
 }
