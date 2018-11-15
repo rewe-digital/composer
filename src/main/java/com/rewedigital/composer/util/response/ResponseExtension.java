@@ -2,8 +2,9 @@ package com.rewedigital.composer.util.response;
 
 import static java.util.stream.Collectors.toList;
 
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.rewedigital.composer.util.mergable.MergableRoot;
@@ -13,15 +14,24 @@ import com.spotify.apollo.Response;
 
 public class ResponseExtension implements RequestEnricher {
 
-    // FIXME allow only on instance per type!
-    private final List<MergableRoot<?>> roots;
+    private final Map<Class<MergableRoot<?>>, MergableRoot<?>> roots;
 
-    private ResponseExtension(final List<MergableRoot<?>> roots) {
-        this.roots = new LinkedList<>(roots);
+    private ResponseExtension(final Map<Class<MergableRoot<?>>, MergableRoot<?>> roots) {
+        this.roots = roots;
     }
 
     public static ResponseExtension of(final List<MergableRoot<?>> roots) {
-        return new ResponseExtension(roots);
+        Map<Class<MergableRoot<?>>, MergableRoot<?>> mappedRoots = new HashMap<>();
+        for (MergableRoot<?> root : roots) {
+            @SuppressWarnings("unchecked")
+            Class<MergableRoot<?>> type = (Class<MergableRoot<?>>) root.getClass();
+            if (mappedRoots.containsKey(type)) {
+                throw new IllegalArgumentException(
+                        "each type of MergableRoot<> must only appear at most once in parameter roots!");
+            }
+            mappedRoots.put(type, root);
+        }
+        return new ResponseExtension(mappedRoots);
     }
 
     public ResponseExtension mergedWithFragmentFor(final Response<?> response) {
@@ -29,27 +39,23 @@ public class ResponseExtension implements RequestEnricher {
     }
 
     public ResponseExtensionFragment fragmentFor(final Response<?> response) {
-        return new ResponseExtensionFragment(roots.stream().map(r -> r.mergableFor(response)).collect(toList()));
+        return new ResponseExtensionFragment(
+                roots.values().stream().map(r -> r.mergableFor(response)).collect(toList()));
     }
 
     public ResponseExtension mergedWith(final ResponseExtensionFragment fragment) {
-        return ResponseExtension.of(roots.stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
+        return ResponseExtension.of(roots.values().stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
     }
 
     @SuppressWarnings("unchecked")
     public <Y extends MergableRoot<?>> Optional<Y> get(final Class<Y> type) {
-        for (MergableRoot<?> element : roots) {
-            if (type.isInstance(element)) { // FIXME optimize by building up a map type -> instance
-                return (Optional<Y>) Optional.of(element);
-            }
-        }
-        return Optional.empty();
+        return Optional.ofNullable((Y) roots.get(type));
     }
 
     @Override
     public Request enrich(Request request) {
         Request result = request;
-        for (Object element : roots) {
+        for (Object element : roots.values()) {
             if (RequestEnricher.class.isInstance(element)) {
                 result = ((RequestEnricher) element).enrich(result);
             }

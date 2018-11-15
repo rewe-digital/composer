@@ -1,7 +1,5 @@
 package com.rewedigital.composer.util.response;
 
-import static java.util.Arrays.asList;
-
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
