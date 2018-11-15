@@ -35,7 +35,7 @@ public class ComposingRequestHandler {
                 .map(rm -> rm.routeType(routeTypes)
                     .execute(rm, context, extensions))
                 .orElse(defaultResponse(extensions))
-                .thenApply(response -> response.writeSessionToResponse());
+                .thenApply(response -> response.extendedResponse());
         });
     }
 

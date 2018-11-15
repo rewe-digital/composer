@@ -1,5 +1,6 @@
 package com.rewedigital.composer.util.response;
 
+import static com.rewedigital.composer.util.Combiners.throwingCombiner;
 import static java.util.stream.Collectors.toList;
 
 import java.util.HashMap;
@@ -12,6 +13,12 @@ import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
+/**
+ * Extension of a {@link ExtendableResponse}. Holds multiple
+ * {@link MergableRoot}s that form the base of the extensions. Creates
+ * {@link ResponseExtensionFragment}s based on the contained roots.
+ *
+ */
 public class ResponseExtension implements RequestEnricher {
 
     private final Map<Class<MergableRoot<?>>, MergableRoot<?>> roots;
@@ -54,12 +61,12 @@ public class ResponseExtension implements RequestEnricher {
 
     @Override
     public Request enrich(Request request) {
-        Request result = request;
-        for (Object element : roots.values()) {
-            if (RequestEnricher.class.isInstance(element)) {
-                result = ((RequestEnricher) element).enrich(result);
-            }
-        }
-        return result;
+        return roots.values().stream().filter(RequestEnricher.class::isInstance).reduce(request,
+                (req, root) -> ((RequestEnricher) root).enrich(req), throwingCombiner());
+    }
+
+    public <P> Response<P> writeTo(final Response<P> response) {
+        return roots.values().stream().reduce(response, (resp, root) -> root.writtenTo(resp), throwingCombiner());
+
     }
 }

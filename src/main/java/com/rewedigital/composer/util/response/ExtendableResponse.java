@@ -3,11 +3,11 @@ package com.rewedigital.composer.util.response;
 import java.util.Objects;
 import java.util.function.Function;
 
-import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Response;
 
 /**
- * Holds a response with payload of type <code>T</code> and extending data via an {@link ResponseExtension}.
+ * Holds a response with payload of type <code>T</code> and extending data via
+ * an {@link ResponseExtension}.
  */
 public class ExtendableResponse<T> {
 
@@ -31,8 +31,7 @@ public class ExtendableResponse<T> {
         return new ExtendableResponse<S>(transformation.apply(response), extension);
     }
 
-    // FIXME
-    public Response<T> writeSessionToResponse() {
-        return extension.get(SessionRoot.class).map(s -> s.writeTo(response)).orElse(response);
+    public Response<T> extendedResponse() {
+        return extension.writeTo(response);
     }
 }

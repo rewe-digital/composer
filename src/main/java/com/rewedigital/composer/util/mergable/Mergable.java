@@ -1,5 +1,10 @@
 package com.rewedigital.composer.util.mergable;
 
+/**
+ * Describes a type of objects that can be merged with each other.
+ *  
+ * @param <T>
+ */
 public interface Mergable<T extends Mergable<T>> {
 
     public T mergedWith(final T other);

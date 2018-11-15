@@ -72,7 +72,7 @@ public class SessionRoot implements MergableRoot<SessionFragment>, RequestEnrich
         return get(sessionIdKey);
     }
 
-    public <T> Response<T> writeTo(final Response<T> response) {
+    public <T> Response<T> writtenTo(final Response<T> response) {
         return serializer.writeTo(response, asHeaders(), dirty);
     }
 

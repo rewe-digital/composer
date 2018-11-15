@@ -8,6 +8,10 @@ import java.util.Optional;
 import com.rewedigital.composer.util.mergable.Mergable;
 import com.rewedigital.composer.util.mergable.Mergables;
 
+/**
+ * Fragment of a {@link ResponseExtension}.
+ *
+ */
 public class ResponseExtensionFragment implements Mergables {
 
     private static final ResponseExtensionFragment empty = new ResponseExtensionFragment(Collections.emptyList());
