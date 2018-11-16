@@ -27,30 +27,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 /**
- * Implementation of a {@link SessionHandler} that stores a session as an encrypted <em>JWT</em> cookie.
+ * Implementation of a {@link SessionHandler} that stores a session as an
+ * encrypted <em>JWT</em> cookie.
  */
 public class CookieBasedSessionHandler extends SessionHandler {
 
-    public static class Factory implements SessionHandlerFactory {
-
-        private final SessionConfiguration configuration;
-
-        public Factory(final Config configuration) {
-            this.configuration = SessionConfiguration.fromConfig(configuration);
-        }
-
-        @Override
-        public SessionHandler build() {
-            if (!configuration.sessionEnabled()) {
-                return SessionHandler.noSession();
-            }
-            return new CookieBasedSessionHandler(configuration);
-        }
-    }
-
     private static final Logger LOGGER = LoggerFactory.getLogger(CookieBasedSessionHandler.class);
-    private static final TypeReference<HashMap<String, String>> typeRef =
-        new TypeReference<HashMap<String, String>>() {};
+    private static final TypeReference<HashMap<String, String>> typeRef = new TypeReference<HashMap<String, String>>() {
+    };
     private static final String PAYLOAD = "payload";
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -60,6 +44,13 @@ public class CookieBasedSessionHandler extends SessionHandler {
     private final SignatureAlgorithm algorithm;
     private final Key signingKey;
 
+    public static SessionHandler create(final Config config) {
+        final SessionConfiguration configuration = SessionConfiguration.fromConfig(config);
+        if (!configuration.sessionEnabled()) {
+            return SessionHandler.noSession();
+        }
+        return new CookieBasedSessionHandler(configuration);
+    }
 
     public CookieBasedSessionHandler(final SessionConfiguration configuration) {
         super(configuration.interceptors());
@@ -75,9 +66,7 @@ public class CookieBasedSessionHandler extends SessionHandler {
     }
 
     private Map<String, String> readFrom(final Request request) {
-        return request.header("Cookie")
-            .map(this::readFromHeader)
-            .orElse(emptyMap());
+        return request.header("Cookie").map(this::readFromHeader).orElse(emptyMap());
     }
 
     @Override
@@ -86,22 +75,15 @@ public class CookieBasedSessionHandler extends SessionHandler {
             return response;
         }
 
-        final String value = Jwts.builder()
-            .claim(PAYLOAD, writeSessionValues(session))
-            .signWith(algorithm, signingKey)
-            .compact();
+        final String value = Jwts.builder().claim(PAYLOAD, writeSessionValues(session)).signWith(algorithm, signingKey)
+                .compact();
         final String cookie = buildSessionCookie(value);
         return response.withHeader("Set-Cookie", cookie);
     }
 
     private Map<String, String> readFromHeader(final String cookieHeader) {
-        return parseCookieHeader(cookieHeader)
-            .stream()
-            .filter(this::isSessionCookie)
-            .map(this::parseSessionCookie)
-            .map(this::extractSessionValues)
-            .findFirst()
-            .orElse(emptyMap());
+        return parseCookieHeader(cookieHeader).stream().filter(this::isSessionCookie).map(this::parseSessionCookie)
+                .map(this::extractSessionValues).findFirst().orElse(emptyMap());
     }
 
     private List<HttpCookie> parseCookieHeader(final String cookieHeader) {

@@ -28,37 +28,37 @@ public class CookieBasedSessionHandlerTest {
 
     @Test
     public void shouldWriteAndReadCookie() throws Exception {
-        final String cookieHeader =
-            dirtySessionRoot("x-rd-key", "value", sessionHandler()).writtenTo(Response.ok()).header("Set-Cookie").get();
-        final SessionRoot session =
-            sessionHandler().initialize(contextFor(Request.forUri("/").withHeader("Cookie", cookieHeader)))
-                .toCompletableFuture().get();
+        final String cookieHeader = dirtySessionRoot("x-rd-key", "value", sessionHandler()).writtenTo(Response.ok())
+                .header("Set-Cookie").get();
+        final SessionRoot session = sessionHandler()
+                .initialize(contextFor(Request.forUri("/").withHeader("Cookie", cookieHeader))).toCompletableFuture()
+                .get();
         assertThat(session.get("key")).contains("value");
     }
 
     @Test
     public void shouldCreateNewSessionIfNonePresent() throws Exception {
-        final SessionRoot session =
-            sessionHandler().initialize(contextFor(Request.forUri("/"))).toCompletableFuture().get();
+        final SessionRoot session = sessionHandler().initialize(contextFor(Request.forUri("/"))).toCompletableFuture()
+                .get();
         assertThat(session).isNotNull();
     }
 
     @Test
     public void shouldNotWriteSessionCookieIfSessionIsNotDirty() {
-        final Optional<String> setCookieHeader =
-            cleanSessionRoot("x-rd-key", "value", sessionHandler()).writtenTo(Response.ok()).header("Set-Cookie");
+        final Optional<String> setCookieHeader = cleanSessionRoot("x-rd-key", "value", sessionHandler())
+                .writtenTo(Response.ok()).header("Set-Cookie");
         assertThat(setCookieHeader).isEmpty();
     }
 
     @Test
     public void shouldBeConstructedWithFactory() {
-        final SessionHandler result = new CookieBasedSessionHandler.Factory(enabledConfig()).build();
+        final SessionHandler result = CookieBasedSessionHandler.create(enabledConfig());
         assertThat(result).isInstanceOf(CookieBasedSessionHandler.class);
     }
 
     @Test
     public void shouldConstructNoopInstanceIfSessionHandlingIsDisabled() {
-        final SessionHandler result = new CookieBasedSessionHandler.Factory(disabledConfig()).build();
+        final SessionHandler result = CookieBasedSessionHandler.create(disabledConfig());
         assertThat(result).isEqualTo(SessionHandler.noSession());
     }
 
@@ -74,7 +74,7 @@ public class CookieBasedSessionHandlerTest {
 
     private SessionConfiguration configuration() {
         return new SessionConfiguration(true, "sessioncookie", SignatureAlgorithm.HS512.getValue(), "123",
-            Collections.emptyList());
+                Collections.emptyList());
     }
 
     private Config enabledConfig() {

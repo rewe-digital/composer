@@ -17,26 +17,23 @@ import com.typesafe.config.Config;
 
 public class RequestHandlerFactory {
 
-
     public static ComposingRequestHandler createRequestHandler(Config configuration) {
-        final ComposingRequestHandler handler =
-            new ComposingRequestHandler(
+        final ComposingRequestHandler handler = new ComposingRequestHandler(
                 new BackendRouting(configuration.getConfig("composer.routing")),
-                new RouteTypes(
-                    new ComposerFactory(configuration.getConfig("composer.html")),
-                    new ExtensionAwareRequestClient()),
+                new RouteTypes(new ComposerFactory(configuration.getConfig("composer.html")),
+                        new ExtensionAwareRequestClient()),
                 responseExtensions(configuration));
         return handler;
     }
 
     public static ResponseExtensionHandler responseExtensions(Config configuration) {
-        final SessionHandler sessionHandler =
-            new CookieBasedSessionHandler.Factory(configuration.getConfig("composer.session")).build();
+        final SessionHandler sessionHandler = CookieBasedSessionHandler
+                .create(configuration.getConfig("composer.session"));
         return new ResponseExtensionHandler() {
             @Override
             public CompletionStage<ResponseExtension> initialize(RequestContext context) {
                 return sessionHandler.initialize(context)
-                    .thenApply(session -> ResponseExtension.of(Arrays.asList(session)));
+                        .thenApply(session -> ResponseExtension.of(Arrays.asList(session)));
             }
 
         };
