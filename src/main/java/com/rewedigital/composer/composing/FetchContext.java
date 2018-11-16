@@ -9,7 +9,7 @@ import java.util.Optional;
 /**
  * A simple parameter object for {@link ContentFetcher}s.
  */
-public class FetchContext {
+class FetchContext {
 
     private final String path;
     private final String fallback;

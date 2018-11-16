@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import com.spotify.apollo.Response;
 
-public class RecursionAwareContentFetcher implements ContentFetcher {
+class RecursionAwareContentFetcher implements ContentFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RecursionAwareContentFetcher.class);
 

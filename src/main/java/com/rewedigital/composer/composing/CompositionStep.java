@@ -7,7 +7,7 @@ import java.util.Objects;
  * It is used to trace the progress of the recursive composition. The composition data itself is handled via
  * {@link Composition}.
  */
-public class CompositionStep {
+class CompositionStep {
 
     private static final CompositionStep root = new CompositionStep(null, "", 0);
 
