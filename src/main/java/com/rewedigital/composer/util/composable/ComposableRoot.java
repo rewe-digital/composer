@@ -16,11 +16,11 @@ public interface ComposableRoot<T extends Composable<T>> {
 
     public T composeableFor(final Response<?> response);
 
-    public Class<T> composeableType();
+    public Class<T> composableType();
 
-    default ComposableRoot<T> composedFrom(final Composables composeables) {
-        Class<T> composeableType = composeableType();
-        Optional<ComposableRoot<T>> map = composeables.get(composeableType).map(r -> this.composedWith((T) r));
+    default ComposableRoot<T> composedFrom(final Composables composables) {
+        Class<T> composableType = composableType();
+        Optional<ComposableRoot<T>> map = composables.get(composableType).map(r -> this.composedWith((T) r));
         return map.orElse(this);
     }
 

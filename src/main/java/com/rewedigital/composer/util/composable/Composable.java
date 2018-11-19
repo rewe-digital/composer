@@ -10,7 +10,7 @@ public interface Composable<T extends Composable<T>> {
     public T mergedWith(final T other);
 
     @SuppressWarnings("unchecked")
-    default T mergedFrom(final Composables mergables) {
-        return mergables.get(this.getClass()).map(r -> this.mergedWith((T) r)).orElse((T) this);
+    default T mergedFrom(final Composables composables) {
+        return composables.get(this.getClass()).map(r -> this.mergedWith((T) r)).orElse((T) this);
     }
 }

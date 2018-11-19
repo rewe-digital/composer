@@ -18,8 +18,8 @@ public class ResponseCompositionFragment implements Composables {
     
     private final List<Composable<?>> composables;
 
-    ResponseCompositionFragment(final List<Composable<?>> composeables) {
-        this.composables = new LinkedList<>(composeables);
+    ResponseCompositionFragment(final List<Composable<?>> composables) {
+        this.composables = new LinkedList<>(composables);
     }
 
     public static ResponseCompositionFragment empty() {

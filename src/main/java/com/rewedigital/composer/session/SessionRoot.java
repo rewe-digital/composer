@@ -100,7 +100,7 @@ public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnri
     }
 
     @Override
-    public Class<SessionFragment> composeableType() {
+    public Class<SessionFragment> composableType() {
         return SessionFragment.class;
     }
 
