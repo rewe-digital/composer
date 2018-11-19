@@ -5,14 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.composeable.Composable;
-import com.rewedigital.composer.util.composeable.Composeables;
+import com.rewedigital.composer.util.composable.Composable;
+import com.rewedigital.composer.util.composable.Composables;
 
 /**
  * Fragment of a {@link ResponseComposition}.
  *
  */
-public class ResponseCompositionFragment implements Composeables {
+public class ResponseCompositionFragment implements Composables {
 
     private static final ResponseCompositionFragment empty = new ResponseCompositionFragment(Collections.emptyList());
     

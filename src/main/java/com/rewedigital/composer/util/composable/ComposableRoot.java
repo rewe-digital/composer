@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.composeable;
+package com.rewedigital.composer.util.composable;
 
 import java.util.Optional;
 
@@ -10,17 +10,17 @@ import com.spotify.apollo.Response;
  *
  * @param <T>
  */
-public interface ComposeableRoot<T extends Composable<T>> {
+public interface ComposableRoot<T extends Composable<T>> {
 
-    public ComposeableRoot<T> composedWith(T composeable);
+    public ComposableRoot<T> composedWith(T composeable);
 
     public T composeableFor(final Response<?> response);
 
     public Class<T> composeableType();
 
-    default ComposeableRoot<T> composedFrom(final Composeables composeables) {
+    default ComposableRoot<T> composedFrom(final Composables composeables) {
         Class<T> composeableType = composeableType();
-        Optional<ComposeableRoot<T>> map = composeables.get(composeableType).map(r -> this.composedWith((T) r));
+        Optional<ComposableRoot<T>> map = composeables.get(composeableType).map(r -> this.composedWith((T) r));
         return map.orElse(this);
     }
 

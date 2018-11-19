@@ -8,30 +8,30 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.composeable.ComposeableRoot;
+import com.rewedigital.composer.util.composable.ComposableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
  * Extension of a {@link ComposedResponse}. Holds multiple
- * {@link ComposeableRoot}s that form the base of the extensions. Creates
+ * {@link ComposableRoot}s that form the base of the extensions. Creates
  * {@link ResponseCompositionFragment}s based on the contained roots.
  *
  */
 public class ResponseComposition implements RequestEnricher {
 
-    private final Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> roots;
+    private final Map<Class<ComposableRoot<?>>, ComposableRoot<?>> roots;
 
-    private ResponseComposition(final Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> roots) {
+    private ResponseComposition(final Map<Class<ComposableRoot<?>>, ComposableRoot<?>> roots) {
         this.roots = roots;
     }
 
-    public static ResponseComposition of(final List<ComposeableRoot<?>> roots) {
-        Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> mappedRoots = new HashMap<>();
-        for (ComposeableRoot<?> root : roots) {
+    public static ResponseComposition of(final List<ComposableRoot<?>> roots) {
+        Map<Class<ComposableRoot<?>>, ComposableRoot<?>> mappedRoots = new HashMap<>();
+        for (ComposableRoot<?> root : roots) {
             @SuppressWarnings("unchecked")
-            Class<ComposeableRoot<?>> type = (Class<ComposeableRoot<?>>) root.getClass();
+            Class<ComposableRoot<?>> type = (Class<ComposableRoot<?>>) root.getClass();
             if (mappedRoots.containsKey(type)) {
                 throw new IllegalArgumentException(
                         "each type of MergableRoot<> must only appear at most once in parameter roots!");
@@ -55,7 +55,7 @@ public class ResponseComposition implements RequestEnricher {
     }
 
     @SuppressWarnings("unchecked")
-    public <Y extends ComposeableRoot<?>> Optional<Y> get(final Class<Y> type) {
+    public <Y extends ComposableRoot<?>> Optional<Y> get(final Class<Y> type) {
         return Optional.ofNullable((Y) roots.get(type));
     }
 

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.composeable.ComposeableRoot;
+import com.rewedigital.composer.util.composable.ComposableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -18,7 +18,7 @@ import com.spotify.apollo.Response;
  * A root session can be written to a response using an instance of a {@link SessionRoot.Serializer}.
  *
  */
-public class SessionRoot implements ComposeableRoot<SessionFragment>, RequestEnricher {
+public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnricher {
 
     public interface Serializer {
         <T> Response<T> writeTo(final Response<T> response, final Map<String, String> sessionData, boolean dirty);
