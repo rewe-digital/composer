@@ -42,7 +42,7 @@ public class ResponseComposition implements RequestEnricher {
     }
 
     public ResponseComposition composedWithFragmentFor(final Response<?> response) {
-        return this.mergedWith(fragmentFor(response));
+        return this.composedWith(fragmentFor(response));
     }
 
     public ResponseCompositionFragment fragmentFor(final Response<?> response) {
@@ -50,7 +50,7 @@ public class ResponseComposition implements RequestEnricher {
                 roots.values().stream().map(r -> r.composeableFor(response)).collect(toList()));
     }
 
-    public ResponseComposition mergedWith(final ResponseCompositionFragment fragment) {
+    public ResponseComposition composedWith(final ResponseCompositionFragment fragment) {
         return ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(fragment)).collect(toList()));
     }
 

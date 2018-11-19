@@ -41,7 +41,7 @@ public class AttoParserBasedComposer implements ContentComposer, TemplateCompose
 
     private Composition.Extractor<ComposedResponse<String>> response() {
         return (payload, extensionFragment) -> new ComposedResponse<String>(Response.forPayload(payload), 
-                extension.mergedWith(extensionFragment));
+                extension.composedWith(extensionFragment));
     }
 
     @Override
