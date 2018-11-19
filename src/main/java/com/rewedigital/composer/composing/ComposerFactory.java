@@ -2,7 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.Map;
 
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.typesafe.config.Config;
 
@@ -19,7 +19,7 @@ public class ComposerFactory {
     }
 
     public TemplateComposer build(final Client client, final Map<String, Object> parsedPathArguments,
-            final ResponseExtension extensions) {
+            final ResponseComposition extensions) {
         return new AttoParserBasedComposer(new ValidatingContentFetcher(client, parsedPathArguments, extensions),
                 extensions, configuration);
     }

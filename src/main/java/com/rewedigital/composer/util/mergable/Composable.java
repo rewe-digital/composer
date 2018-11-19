@@ -5,7 +5,7 @@ package com.rewedigital.composer.util.mergable;
  *  
  * @param <T>
  */
-public interface Mergable<T extends Mergable<T>> {
+public interface Composable<T extends Composable<T>> {
 
     public T mergedWith(final T other);
 

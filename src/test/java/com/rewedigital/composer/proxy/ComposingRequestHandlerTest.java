@@ -24,7 +24,7 @@ import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.rewedigital.composer.util.response.ResponseExtensionHandler;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
@@ -96,8 +96,8 @@ public class ComposingRequestHandlerTest {
         return new ResponseExtensionHandler() {
 
             @Override
-            public CompletionStage<ResponseExtension> initialize(RequestContext context) {
-                return CompletableFuture.completedFuture(ResponseExtension.of(Collections.emptyList()));
+            public CompletionStage<ResponseComposition> initialize(RequestContext context) {
+                return CompletableFuture.completedFuture(ResponseComposition.of(Collections.emptyList()));
             }
         };
 
@@ -109,7 +109,7 @@ public class ComposingRequestHandlerTest {
             return new RouteTypes(composerFactory(), new ExtensionAwareRequestClient() {
                 @Override
                 public CompletionStage<ExtendableResponse<ByteString>> fetch(final RouteMatch rm,
-                    final RequestContext context, final ResponseExtension extension) {
+                    final RequestContext context, final ResponseComposition extension) {
                     return CompletableFuture.completedFuture(
                         new ExtendableResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
                 }

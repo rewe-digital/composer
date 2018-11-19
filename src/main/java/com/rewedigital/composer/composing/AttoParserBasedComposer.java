@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 
 import com.rewedigital.composer.parser.Parser;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Response;
 
 /**
@@ -16,9 +16,9 @@ public class AttoParserBasedComposer implements ContentComposer, TemplateCompose
 
     private final ContentFetcher contentFetcher;
     private final ComposerHtmlConfiguration configuration;
-    private final ResponseExtension extension;
+    private final ResponseComposition extension;
 
-    public AttoParserBasedComposer(final ContentFetcher contentFetcher,  final ResponseExtension extension,
+    public AttoParserBasedComposer(final ContentFetcher contentFetcher,  final ResponseComposition extension,
             final ComposerHtmlConfiguration configuration) {
         this.configuration = requireNonNull(configuration);
         this.contentFetcher = new RecursionAwareContentFetcher(requireNonNull(contentFetcher),

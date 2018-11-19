@@ -10,7 +10,7 @@ import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.rewedigital.composer.session.SessionHandler;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.rewedigital.composer.util.response.ResponseExtensionHandler;
 import com.spotify.apollo.RequestContext;
 import com.typesafe.config.Config;
@@ -31,9 +31,9 @@ public class RequestHandlerFactory {
                 .create(configuration.getConfig("composer.session"));
         return new ResponseExtensionHandler() {
             @Override
-            public CompletionStage<ResponseExtension> initialize(RequestContext context) {
+            public CompletionStage<ResponseComposition> initialize(RequestContext context) {
                 return sessionHandler.initialize(context)
-                        .thenApply(session -> ResponseExtension.of(Arrays.asList(session)));
+                        .thenApply(session -> ResponseComposition.of(Arrays.asList(session)));
             }
 
         };

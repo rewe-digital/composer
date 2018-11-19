@@ -25,7 +25,7 @@ import org.junit.Test;
 import com.rewedigital.composer.helper.ARequest;
 import com.rewedigital.composer.session.SessionRoot;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -235,7 +235,7 @@ public class ComposingTemplatesTest {
     }
 
     private TemplateComposer makeComposer(final Client client) {
-        final ResponseExtension extensions = ResponseExtension.of(Arrays.asList(SessionRoot.empty()));
+        final ResponseComposition extensions = ResponseComposition.of(Arrays.asList(SessionRoot.empty()));
         return new AttoParserBasedComposer(new ValidatingContentFetcher(client, Collections.emptyMap(), extensions),
             extensions, new ComposerHtmlConfiguration("include", "content", "data-rd-options", maxRecursionDepth));
     }

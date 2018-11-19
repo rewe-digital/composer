@@ -10,7 +10,7 @@ import java.util.concurrent.CompletionStage;
 
 import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -33,7 +33,7 @@ public class TemplateRoute implements RouteType {
 
     @Override
     public CompletionStage<ExtendableResponse<ByteString>> execute(final RouteMatch rm, final RequestContext context,
-        final ResponseExtension extensions) {
+        final ResponseComposition extensions) {
         return templateClient.fetch(rm, context, extensions)
             .thenCompose(
                 templateResponse -> process(context.requestScopedClient(), rm.parsedPathArguments(), templateResponse,

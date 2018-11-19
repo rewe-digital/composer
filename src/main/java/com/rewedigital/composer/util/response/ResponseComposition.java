@@ -8,54 +8,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.MergableRoot;
+import com.rewedigital.composer.util.mergable.ComposeableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
  * Extension of a {@link ExtendableResponse}. Holds multiple
- * {@link MergableRoot}s that form the base of the extensions. Creates
- * {@link ResponseExtensionFragment}s based on the contained roots.
+ * {@link ComposeableRoot}s that form the base of the extensions. Creates
+ * {@link ResponseCompositionFragment}s based on the contained roots.
  *
  */
-public class ResponseExtension implements RequestEnricher {
+public class ResponseComposition implements RequestEnricher {
 
-    private final Map<Class<MergableRoot<?>>, MergableRoot<?>> roots;
+    private final Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> roots;
 
-    private ResponseExtension(final Map<Class<MergableRoot<?>>, MergableRoot<?>> roots) {
+    private ResponseComposition(final Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> roots) {
         this.roots = roots;
     }
 
-    public static ResponseExtension of(final List<MergableRoot<?>> roots) {
-        Map<Class<MergableRoot<?>>, MergableRoot<?>> mappedRoots = new HashMap<>();
-        for (MergableRoot<?> root : roots) {
+    public static ResponseComposition of(final List<ComposeableRoot<?>> roots) {
+        Map<Class<ComposeableRoot<?>>, ComposeableRoot<?>> mappedRoots = new HashMap<>();
+        for (ComposeableRoot<?> root : roots) {
             @SuppressWarnings("unchecked")
-            Class<MergableRoot<?>> type = (Class<MergableRoot<?>>) root.getClass();
+            Class<ComposeableRoot<?>> type = (Class<ComposeableRoot<?>>) root.getClass();
             if (mappedRoots.containsKey(type)) {
                 throw new IllegalArgumentException(
                         "each type of MergableRoot<> must only appear at most once in parameter roots!");
             }
             mappedRoots.put(type, root);
         }
-        return new ResponseExtension(mappedRoots);
+        return new ResponseComposition(mappedRoots);
     }
 
-    public ResponseExtension mergedWithFragmentFor(final Response<?> response) {
+    public ResponseComposition composedWithFragmentFor(final Response<?> response) {
         return this.mergedWith(fragmentFor(response));
     }
 
-    public ResponseExtensionFragment fragmentFor(final Response<?> response) {
-        return new ResponseExtensionFragment(
+    public ResponseCompositionFragment fragmentFor(final Response<?> response) {
+        return new ResponseCompositionFragment(
                 roots.values().stream().map(r -> r.mergableFor(response)).collect(toList()));
     }
 
-    public ResponseExtension mergedWith(final ResponseExtensionFragment fragment) {
-        return ResponseExtension.of(roots.values().stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
+    public ResponseComposition mergedWith(final ResponseCompositionFragment fragment) {
+        return ResponseComposition.of(roots.values().stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
     }
 
     @SuppressWarnings("unchecked")
-    public <Y extends MergableRoot<?>> Optional<Y> get(final Class<Y> type) {
+    public <Y extends ComposeableRoot<?>> Optional<Y> get(final Class<Y> type) {
         return Optional.ofNullable((Y) roots.get(type));
     }
 

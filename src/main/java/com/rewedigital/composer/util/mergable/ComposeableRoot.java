@@ -5,22 +5,22 @@ import java.util.Optional;
 import com.spotify.apollo.Response;
 
 /**
- * The root of a a group of {@link Mergable}s. Individual {@link Mergable}s can
+ * The root of a a group of {@link Composable}s. Individual {@link Composable}s can
  * be created using the root as well as merged into a root.
  *
  * @param <T>
  */
-public interface MergableRoot<T extends Mergable<T>> {
+public interface ComposeableRoot<T extends Composable<T>> {
 
-    public MergableRoot<T> mergedWith(T mergable);
+    public ComposeableRoot<T> mergedWith(T mergable);
 
     public T mergableFor(final Response<?> response);
 
     public Class<T> mergableType();
 
-    default MergableRoot<T> mergedFrom(final Mergables mergables) {
+    default ComposeableRoot<T> mergedFrom(final Mergables mergables) {
         Class<T> mergableType = mergableType();
-        Optional<MergableRoot<T>> map = mergables.get(mergableType).map(r -> this.mergedWith((T) r));
+        Optional<ComposeableRoot<T>> map = mergables.get(mergableType).map(r -> this.mergedWith((T) r));
         return map.orElse(this);
     }
 

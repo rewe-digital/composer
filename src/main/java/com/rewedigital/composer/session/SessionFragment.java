@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.Mergable;
+import com.rewedigital.composer.util.mergable.Composable;
 import com.spotify.apollo.Response;
 
 /**
@@ -15,7 +15,7 @@ import com.spotify.apollo.Response;
  * (template or content) response. Session fragments can be merged to construct
  * a combined fragment.
  */
- public class SessionFragment implements Mergable<SessionFragment> {
+ public class SessionFragment implements Composable<SessionFragment> {
 
     private static final SessionFragment emptySession = new SessionFragment(new HashMap<>());
 

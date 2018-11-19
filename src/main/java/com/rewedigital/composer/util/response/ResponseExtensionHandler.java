@@ -5,11 +5,11 @@ import java.util.concurrent.CompletionStage;
 import com.spotify.apollo.RequestContext;
 
 /**
- * Initializes a structure of a {@link ResponseExtension} for a
+ * Initializes a structure of a {@link ResponseComposition} for a
  * {@link RequestContext}.
  */
 public interface ResponseExtensionHandler {
 
-    public CompletionStage<ResponseExtension> initialize(final RequestContext context);
+    public CompletionStage<ResponseComposition> initialize(final RequestContext context);
 
 }

@@ -7,7 +7,7 @@ import java.util.concurrent.CompletionStage;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.rewedigital.composer.util.response.ResponseExtensionHandler;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -40,7 +40,7 @@ public class ComposingRequestHandler {
     }
 
     private static CompletableFuture<ExtendableResponse<ByteString>> defaultResponse(
-        final ResponseExtension extensions) {
+        final ResponseComposition extensions) {
         final Response<ByteString> response =
             Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"));
         return CompletableFuture

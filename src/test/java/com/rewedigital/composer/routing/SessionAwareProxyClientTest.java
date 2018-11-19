@@ -13,7 +13,7 @@ import org.junit.Test;
 import com.rewedigital.composer.helper.Sessions;
 import com.rewedigital.composer.session.SessionRoot;
 import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -63,7 +63,7 @@ public class SessionAwareProxyClientTest {
         return client;
     }
 
-    private ResponseExtension session(final String key, final String value) {
-        return ResponseExtension.of(asList(Sessions.sessionRoot(key, value)));
+    private ResponseComposition session(final String key, final String value) {
+        return ResponseComposition.of(asList(Sessions.sessionRoot(key, value)));
     }
 }
