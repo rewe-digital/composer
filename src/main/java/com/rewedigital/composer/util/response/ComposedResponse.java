@@ -9,12 +9,12 @@ import com.spotify.apollo.Response;
  * Holds a response with payload of type <code>T</code> and extending data via
  * an {@link ResponseComposition}.
  */
-public class ExtendableResponse<T> {
+public class ComposedResponse<T> {
 
     private final Response<T> response;
     private final ResponseComposition extension;
 
-    public ExtendableResponse(final Response<T> response, final ResponseComposition extension) {
+    public ComposedResponse(final Response<T> response, final ResponseComposition extension) {
         this.response = Objects.requireNonNull(response);
         this.extension = Objects.requireNonNull(extension);
     }
@@ -27,8 +27,8 @@ public class ExtendableResponse<T> {
         return extension;
     }
 
-    public <S> ExtendableResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
-        return new ExtendableResponse<S>(transformation.apply(response), extension);
+    public <S> ComposedResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
+        return new ComposedResponse<S>(transformation.apply(response), extension);
     }
 
     public Response<T> extendedResponse() {

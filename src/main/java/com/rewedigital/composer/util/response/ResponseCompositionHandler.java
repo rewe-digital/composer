@@ -8,7 +8,7 @@ import com.spotify.apollo.RequestContext;
  * Initializes a structure of a {@link ResponseComposition} for a
  * {@link RequestContext}.
  */
-public interface ResponseExtensionHandler {
+public interface ResponseCompositionHandler {
 
     public CompletionStage<ResponseComposition> initialize(final RequestContext context);
 

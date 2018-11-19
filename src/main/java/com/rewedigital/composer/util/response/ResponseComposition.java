@@ -14,7 +14,7 @@ import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
- * Extension of a {@link ExtendableResponse}. Holds multiple
+ * Extension of a {@link ComposedResponse}. Holds multiple
  * {@link ComposeableRoot}s that form the base of the extensions. Creates
  * {@link ResponseCompositionFragment}s based on the contained roots.
  *

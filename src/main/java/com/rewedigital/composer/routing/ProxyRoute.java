@@ -3,7 +3,7 @@ package com.rewedigital.composer.routing;
 import java.util.Objects;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ComposedResponse;
 import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.RequestContext;
 
@@ -21,7 +21,7 @@ public class ProxyRoute implements RouteType {
     }
 
     @Override
-    public CompletionStage<ExtendableResponse<ByteString>> execute(final RouteMatch rm, final RequestContext context,
+    public CompletionStage<ComposedResponse<ByteString>> execute(final RouteMatch rm, final RequestContext context,
         final ResponseComposition extension) {
         return templateClient.fetch(rm, context, extension);
     }

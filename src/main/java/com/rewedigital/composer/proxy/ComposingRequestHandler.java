@@ -6,9 +6,9 @@ import java.util.concurrent.CompletionStage;
 
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ComposedResponse;
 import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseExtensionHandler;
+import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
@@ -19,10 +19,10 @@ public class ComposingRequestHandler {
 
     private final BackendRouting routing;
     private final RouteTypes routeTypes;
-    private final ResponseExtensionHandler extensionHandler;
+    private final ResponseCompositionHandler extensionHandler;
 
     public ComposingRequestHandler(final BackendRouting routing, final RouteTypes routeTypes,
-        final ResponseExtensionHandler extensionHandler) {
+        final ResponseCompositionHandler extensionHandler) {
         this.routing = Objects.requireNonNull(routing);
         this.routeTypes = Objects.requireNonNull(routeTypes);
         this.extensionHandler = Objects.requireNonNull(extensionHandler);
@@ -39,11 +39,11 @@ public class ComposingRequestHandler {
         });
     }
 
-    private static CompletableFuture<ExtendableResponse<ByteString>> defaultResponse(
+    private static CompletableFuture<ComposedResponse<ByteString>> defaultResponse(
         final ResponseComposition extensions) {
         final Response<ByteString> response =
             Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"));
         return CompletableFuture
-            .completedFuture(new ExtendableResponse<ByteString>(response, extensions));
+            .completedFuture(new ComposedResponse<ByteString>(response, extensions));
     }
 }

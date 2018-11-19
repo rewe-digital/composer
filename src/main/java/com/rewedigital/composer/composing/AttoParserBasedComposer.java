@@ -5,7 +5,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.concurrent.CompletableFuture;
 
 import com.rewedigital.composer.parser.Parser;
-import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ComposedResponse;
 import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Response;
 
@@ -28,7 +28,7 @@ public class AttoParserBasedComposer implements ContentComposer, TemplateCompose
     }
 
     @Override
-    public CompletableFuture<ExtendableResponse<String>> composeTemplate(final Response<String> templateResponse,
+    public CompletableFuture<ComposedResponse<String>> composeTemplate(final Response<String> templateResponse,
             final String templatePath) {
         return parse(bodyOf(templateResponse), ContentRange.allUpToo(bodyOf(templateResponse).length()))
                 .composeIncludes(contentFetcher, this, CompositionStep.root(templatePath))
@@ -39,8 +39,8 @@ public class AttoParserBasedComposer implements ContentComposer, TemplateCompose
                 .thenApply(r -> r.transform(response -> response.withHeader("Cache-Control", "no-store,max-age=0")));
     }
 
-    private Composition.Extractor<ExtendableResponse<String>> response() {
-        return (payload, extensionFragment) -> new ExtendableResponse<String>(Response.forPayload(payload), 
+    private Composition.Extractor<ComposedResponse<String>> response() {
+        return (payload, extensionFragment) -> new ComposedResponse<String>(Response.forPayload(payload), 
                 extension.mergedWith(extensionFragment));
     }
 

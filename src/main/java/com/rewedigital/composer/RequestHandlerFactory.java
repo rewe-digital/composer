@@ -11,7 +11,7 @@ import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.rewedigital.composer.session.SessionHandler;
 import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseExtensionHandler;
+import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.RequestContext;
 import com.typesafe.config.Config;
 
@@ -26,10 +26,10 @@ public class RequestHandlerFactory {
         return handler;
     }
 
-    public static ResponseExtensionHandler responseExtensions(Config configuration) {
+    public static ResponseCompositionHandler responseExtensions(Config configuration) {
         final SessionHandler sessionHandler = CookieBasedSessionHandler
                 .create(configuration.getConfig("composer.session"));
-        return new ResponseExtensionHandler() {
+        return new ResponseCompositionHandler() {
             @Override
             public CompletionStage<ResponseComposition> initialize(RequestContext context) {
                 return sessionHandler.initialize(context)

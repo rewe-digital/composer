@@ -23,9 +23,9 @@ import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.util.response.ExtendableResponse;
+import com.rewedigital.composer.util.response.ComposedResponse;
 import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseExtensionHandler;
+import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -92,8 +92,8 @@ public class ComposingRequestHandlerTest {
         return context;
     }
 
-    private ResponseExtensionHandler sessionSerializer() {
-        return new ResponseExtensionHandler() {
+    private ResponseCompositionHandler sessionSerializer() {
+        return new ResponseCompositionHandler() {
 
             @Override
             public CompletionStage<ResponseComposition> initialize(RequestContext context) {
@@ -108,10 +108,10 @@ public class ComposingRequestHandlerTest {
         public static RouteTypes returning(final Status status, final String responseBody) {
             return new RouteTypes(composerFactory(), new ExtensionAwareRequestClient() {
                 @Override
-                public CompletionStage<ExtendableResponse<ByteString>> fetch(final RouteMatch rm,
+                public CompletionStage<ComposedResponse<ByteString>> fetch(final RouteMatch rm,
                     final RequestContext context, final ResponseComposition extension) {
                     return CompletableFuture.completedFuture(
-                        new ExtendableResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
+                        new ComposedResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
                 }
             });
         }
