@@ -13,22 +13,22 @@ import java.util.stream.Stream;
  */
 class IncludeProcessor {
 
-    private final List<IncludedService> includedServices;
+    private final List<IncludedFragment> includedFragments;
     private final ContentRange contentRange;
     private final String template;
     private final List<Asset> assets;
 
-    public IncludeProcessor(final String template, final List<IncludedService> includedServices,
+    public IncludeProcessor(final String template, final List<IncludedFragment> includedFragments,
         final ContentRange contentRange, final List<Asset> assets) {
         this.template = template;
-        this.includedServices = includedServices;
+        this.includedFragments = includedFragments;
         this.contentRange = contentRange;
         this.assets = assets;
     }
 
     public CompletableFuture<Composition> composeIncludes(final ContentFetcher contentFetcher,
         final ContentComposer composer, final CompositionStep step) {
-        final Stream<CompletableFuture<Composition>> composedIncludes = includedServices.stream()
+        final Stream<CompletableFuture<Composition>> composedIncludes = includedFragments.stream()
             .filter(s -> s.isInRage(contentRange))
             .map(s -> s.fetch(contentFetcher, step)
                 .thenCompose(r -> r.compose(composer)));

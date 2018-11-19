@@ -15,9 +15,9 @@ class IncludeMarkupHandler extends AbstractMarkupHandler {
 
     private final char[] includeTag;
 
-    private final List<IncludedService> includedServices = new ArrayList<>();
+    private final List<IncludedFragment> includedServices = new ArrayList<>();
     private final ContentMarkupHandler contentMarkupHandler;
-    private Optional<IncludedService.Builder> include = Optional.empty();
+    private Optional<IncludedFragment.Builder> include = Optional.empty();
     private StringWriter fallbackWriter;
     private IMarkupHandler next;
     private boolean collectAttributes = false;
@@ -47,7 +47,7 @@ class IncludeMarkupHandler extends AbstractMarkupHandler {
         throws ParseException {
         next.handleOpenElementStart(buffer, nameOffset, nameLen, line, col);
         if (isIncludeElement(buffer, nameOffset, nameLen)) {
-            final IncludedService.Builder value = new IncludedService.Builder();
+            final IncludedFragment.Builder value = new IncludedFragment.Builder();
             value.startOffset(nameOffset - 1);
             include = Optional.of(value);
             collectAttributes = true;
@@ -79,7 +79,7 @@ class IncludeMarkupHandler extends AbstractMarkupHandler {
         throws ParseException {
 
         if (collectAttributes) {
-            final IncludedService.Builder includedService = include.get();
+            final IncludedFragment.Builder includedService = include.get();
             includedService.attribute(new String(buffer, nameOffset, nameLen),
                 new String(buffer, valueContentOffset, valueContentLen));
         } else {
@@ -106,7 +106,7 @@ class IncludeMarkupHandler extends AbstractMarkupHandler {
         final int col)
         throws ParseException {
         if (isIncludeElement(buffer, nameOffset, nameLen) && include.isPresent()) {
-            final IncludedService.Builder value = include.get();
+            final IncludedFragment.Builder value = include.get();
             value.endOffset(nameOffset + nameLen + 1);
             value.fallback(fallbackWriter.toString());
             includedServices.add(value.build());

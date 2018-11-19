@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.ComposeableRoot;
+import com.rewedigital.composer.util.composeable.ComposeableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -47,11 +47,11 @@ public class ResponseComposition implements RequestEnricher {
 
     public ResponseCompositionFragment fragmentFor(final Response<?> response) {
         return new ResponseCompositionFragment(
-                roots.values().stream().map(r -> r.mergableFor(response)).collect(toList()));
+                roots.values().stream().map(r -> r.composeableFor(response)).collect(toList()));
     }
 
     public ResponseComposition mergedWith(final ResponseCompositionFragment fragment) {
-        return ResponseComposition.of(roots.values().stream().map(r -> r.mergedFrom(fragment)).collect(toList()));
+        return ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(fragment)).collect(toList()));
     }
 
     @SuppressWarnings("unchecked")

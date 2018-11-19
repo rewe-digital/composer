@@ -5,14 +5,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.Composable;
-import com.rewedigital.composer.util.mergable.Mergables;
+import com.rewedigital.composer.util.composeable.Composable;
+import com.rewedigital.composer.util.composeable.Composeables;
 
 /**
  * Fragment of a {@link ResponseComposition}.
  *
  */
-public class ResponseCompositionFragment implements Mergables {
+public class ResponseCompositionFragment implements Composeables {
 
     private static final ResponseCompositionFragment empty = new ResponseCompositionFragment(Collections.emptyList());
     

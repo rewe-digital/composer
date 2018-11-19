@@ -49,7 +49,7 @@ public class SessionTest {
 
     @Test
     public void enrichesRequestWithSessionHeaders() {
-        final SessionRoot session = sessionRoot("x-rd-some-key", "value").mergedWith(
+        final SessionRoot session = sessionRoot("x-rd-some-key", "value").composedWith(
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-other-key", "other-value")));
         final Request request = session.enrich(Request.forUri("/some/path"));
 
@@ -63,7 +63,7 @@ public class SessionTest {
         final SessionFragment secondSession =
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-second-key", "second-value"));
 
-        final SessionRoot result = firstSession.mergedWith(secondSession);
+        final SessionRoot result = firstSession.composedWith(secondSession);
         assertThat(result.isDirty()).isTrue();
     }
 
@@ -73,7 +73,7 @@ public class SessionTest {
         final SessionFragment secondSession =
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-first-key", "first-value"));
 
-        final SessionRoot result = sessionRoot.mergedWith(secondSession);
+        final SessionRoot result = sessionRoot.composedWith(secondSession);
         assertThat(result.isDirty()).isFalse();
     }
 
@@ -83,7 +83,7 @@ public class SessionTest {
         final SessionFragment secondSession =
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-first-key", "second-value"));
 
-        final SessionRoot result = firstSession.mergedWith(secondSession);
+        final SessionRoot result = firstSession.composedWith(secondSession);
         assertThat(result.isDirty()).isTrue();
         assertThat(result.get("first-key")).contains("second-value");
     }
@@ -94,7 +94,7 @@ public class SessionTest {
         final SessionFragment sessionWithOtherId =
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-session-id", "otherSessionId"));
 
-        final SessionRoot mergedSession = initialSession.mergedWith(sessionWithOtherId);
+        final SessionRoot mergedSession = initialSession.composedWith(sessionWithOtherId);
         assertThat(mergedSession.getId()).contains("initialSessionId");
     }
 
@@ -105,7 +105,7 @@ public class SessionTest {
             Response.forStatus(Status.OK)
                 .withHeader("x-rd-key", ""));
 
-        final SessionRoot mergedSession = firstSession.mergedWith(secondSession);
+        final SessionRoot mergedSession = firstSession.composedWith(secondSession);
         assertThat(mergedSession.get("first-key")).isEmpty();
         assertThat(mergedSession.get("second-key")).isEmpty();
     }

@@ -5,14 +5,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.ComposeableRoot;
+import com.rewedigital.composer.util.composeable.ComposeableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
  * Describes the <em>root</em> session of a request. The root session is constructed from a data map, can be written as
- * a set of http headers to a request and can be updated ({@link #mergedWith(SessionFragment)}) with data from a
+ * a set of http headers to a request and can be updated ({@link #composedWith(SessionFragment)}) with data from a
  * {@link SessionFragment}. A root session is dirty if after a merge the data has changed.
  *
  * A root session can be written to a response using an instance of a {@link SessionRoot.Serializer}.
@@ -76,7 +76,7 @@ public class SessionRoot implements ComposeableRoot<SessionFragment>, RequestEnr
         return serializer.writeTo(response, asHeaders(), dirty);
     }
 
-    public SessionRoot mergedWith(final SessionFragment other) {
+    public SessionRoot composedWith(final SessionFragment other) {
         final SessionData mergedData = data.mergedWith(other.data);
         final SessionData newData = getId().map(id -> mergedData.with(sessionIdKey, id)).orElse(mergedData);
         final boolean newDirty = !data.equals(newData);
@@ -100,12 +100,12 @@ public class SessionRoot implements ComposeableRoot<SessionFragment>, RequestEnr
     }
 
     @Override
-    public Class<SessionFragment> mergableType() {
+    public Class<SessionFragment> composeableType() {
         return SessionFragment.class;
     }
 
     @Override
-    public SessionFragment mergableFor(Response<?> response) {
+    public SessionFragment composeableFor(Response<?> response) {
         return SessionFragment.of(response);
     }
 

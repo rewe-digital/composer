@@ -16,11 +16,11 @@ import com.spotify.apollo.Response;
  * template for further processing in a {@link Composition}.
  *
  * An included service can {@link #fetch(ContentFetcher, CompositionStep)} the content using a {@link ContentFetcher}
- * creating an instance of {@link IncludedService.WithResponse} that holds the response.
+ * creating an instance of {@link IncludedFragment.WithResponse} that holds the response.
  */
-class IncludedService {
+class IncludedFragment {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(IncludedService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(IncludedFragment.class);
 
     public static class Builder {
         private int startOffset;
@@ -48,8 +48,8 @@ class IncludedService {
             return this;
         }
 
-        public IncludedService build() {
-            return new IncludedService(this);
+        public IncludedFragment build() {
+            return new IncludedFragment(this);
         }
     }
 
@@ -81,14 +81,14 @@ class IncludedService {
     private final Map<String, String> attributes;
     private final String fallback;
 
-    private IncludedService(final Builder builder) {
+    private IncludedFragment(final Builder builder) {
         this.startOffset = builder.startOffset;
         this.endOffset = builder.endOffset;
         this.attributes = new HashMap<>(builder.attributes);
         this.fallback = builder.fallback;
     }
 
-    public CompletableFuture<IncludedService.WithResponse> fetch(final ContentFetcher fetcher,
+    public CompletableFuture<IncludedFragment.WithResponse> fetch(final ContentFetcher fetcher,
         final CompositionStep parentStep) {
         final CompositionStep step = parentStep.childWith(path());
         return fetcher.fetch(FetchContext.of(path(), fallback(), ttl()), step)

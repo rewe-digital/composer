@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.mergable.Composable;
+import com.rewedigital.composer.util.composeable.Composable;
 import com.spotify.apollo.Response;
 
 /**
