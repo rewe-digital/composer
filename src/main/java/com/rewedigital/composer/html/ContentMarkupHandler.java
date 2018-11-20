@@ -1,4 +1,4 @@
-package com.rewedigital.composer.composing;
+package com.rewedigital.composer.html;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import org.attoparser.AbstractMarkupHandler;
 import org.attoparser.ParseException;
 import org.attoparser.util.TextUtil;
+
+import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
+import com.rewedigital.composer.composing.ContentRange;
 
 class ContentMarkupHandler extends AbstractMarkupHandler {
 

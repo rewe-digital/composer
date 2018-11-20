@@ -1,12 +1,11 @@
-package com.rewedigital.composer.composing;
+package com.rewedigital.composer.util.composable;
 
 import java.util.Objects;
 
 /**
  * Describes a step in the composition process. The composition is done
  * recursively, and steps are created root to leaf. It is used to trace the
- * progress of the recursive composition. The composition data itself is handled
- * via {@link Composition}.
+ * progress of the recursive composition. .
  */
 public class CompositionStep {
 
@@ -24,6 +23,10 @@ public class CompositionStep {
     private final String path;
     private final int depth;
     private final Position position;
+
+    public static CompositionStep empty() {
+        return root(null);
+    }
 
     public static CompositionStep root(final String path) {
         return new CompositionStep(null, path, new Position(-1, -1), 0);
@@ -52,11 +55,19 @@ public class CompositionStep {
         return this.parent == null;
     }
 
+    public boolean isEmpty() {
+        return path == null && isRoot();
+    }
+
     public CompositionStep childWith(final String path, final int startOffset, final int endOffset) {
         return new CompositionStep(this, path, new Position(startOffset, endOffset), depth + 1);
     }
 
     public String callStack() {
+        if (isEmpty()) {
+            return "";
+        }
+
         if (isRoot()) {
             return "[" + path + "]";
         }

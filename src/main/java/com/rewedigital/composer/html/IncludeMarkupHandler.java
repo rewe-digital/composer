@@ -1,4 +1,4 @@
-package com.rewedigital.composer.composing;
+package com.rewedigital.composer.html;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -11,7 +11,10 @@ import org.attoparser.ParseException;
 import org.attoparser.output.OutputMarkupHandler;
 import org.attoparser.util.TextUtil;
 
-import com.rewedigital.composer.html.ComposableBody;
+import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
+import com.rewedigital.composer.composing.ContentRange;
+import com.rewedigital.composer.composing.IncludedFragment;
+import com.rewedigital.composer.util.composable.CompositionStep;
 
 public class IncludeMarkupHandler extends AbstractMarkupHandler {
 
@@ -30,12 +33,8 @@ public class IncludeMarkupHandler extends AbstractMarkupHandler {
         this.next = contentMarkupHandler;
     }
 
-    public IncludeProcessor buildProcessor(final String template) {
-        return new IncludeProcessor(template, includedServices, contentRange(), assets());
-    }
-
     public ComposableBody result(final String template, final CompositionStep step) {
-        return new ComposableBody(step, includedServices, assets(), template, contentRange());
+        return ComposableBody.of(step, template, contentRange(), includedServices, assets());
     }
 
     public ContentRange contentRange() {

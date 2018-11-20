@@ -2,7 +2,6 @@ package com.rewedigital.composer.util.composable;
 
 import java.util.Optional;
 
-import com.rewedigital.composer.composing.CompositionStep;
 import com.spotify.apollo.Response;
 
 /**

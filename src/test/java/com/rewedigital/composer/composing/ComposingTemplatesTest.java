@@ -22,7 +22,6 @@ import org.assertj.core.api.Condition;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
-import com.rewedigital.composer.composing2.Composer;
 import com.rewedigital.composer.helper.ARequest;
 import com.rewedigital.composer.html.ComposableBodyRoot;
 import com.rewedigital.composer.session.SessionRoot;
@@ -241,9 +240,9 @@ public class ComposingTemplatesTest {
         final ComposerHtmlConfiguration configuration = new ComposerHtmlConfiguration("include", "content",
                 "data-rd-options", maxRecursionDepth);
         final ResponseComposition responseComposition = ResponseComposition
-                .of(Arrays.asList(new ComposableBodyRoot(configuration), SessionRoot.empty()));
-        final ContentFetcher contentFetcher = new RecursionAwareContentFetcher(
-                new ValidatingContentFetcher(client, Collections.emptyMap(), responseComposition),
+                .of(Arrays.asList(ComposableBodyRoot.of(configuration), SessionRoot.empty()));
+        final ContentFetcher contentFetcher = new ValidatingContentFetcher(client, Collections.emptyMap(),
+                responseComposition,
                 configuration.maxRecursion());
         return new Composer(contentFetcher, responseComposition);
     }

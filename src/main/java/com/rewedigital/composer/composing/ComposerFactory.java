@@ -20,8 +20,10 @@ public class ComposerFactory {
 
     public TemplateComposer build(final Client client, final Map<String, Object> parsedPathArguments,
             final ResponseComposition responseComposition) {
-        return new AttoParserBasedComposer(new ValidatingContentFetcher(client, parsedPathArguments, responseComposition),
-                responseComposition, configuration);
+        return new Composer(
+                new ValidatingContentFetcher(client, parsedPathArguments, responseComposition,
+                        configuration.maxRecursion()),
+                responseComposition);
     }
 
 }

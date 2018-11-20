@@ -18,7 +18,7 @@ public class ExtensionAwareRequestClient {
         return context.requestScopedClient()
                 .send(extension
                         .enrich(withTtl(Request.forUri(rm.expandedPath(), context.request().method()), rm.ttl())))
-                .thenApply(r -> new ComposedResponse<>(r, extension.composedWithFragmentFor(r)));
+                .thenApply(r -> new ComposedResponse<>(r, extension.composedWithFragmentFor(r, rm.expandedPath())));
     }
 
     private Request withTtl(final Request request, final Optional<Duration> ttl) {

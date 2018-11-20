@@ -1,6 +1,5 @@
 package com.rewedigital.composer.util.response;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -14,21 +13,16 @@ import com.rewedigital.composer.util.composable.Composables;
  */
 public class ResponseCompositionFragment implements Composables {
 
-    private static final ResponseCompositionFragment empty = new ResponseCompositionFragment(Collections.emptyList());
-
     private final List<Composable<?>> composables;
 
     ResponseCompositionFragment(final List<Composable<?>> composables) {
         this.composables = new LinkedList<>(composables);
     }
 
-    public static ResponseCompositionFragment empty() {
-        return empty;
-    }
-
+    @Override
     @SuppressWarnings("unchecked")
     public <Y> Optional<Y> get(final Class<Y> type) {
-        for (Composable<?> element : composables) {
+        for (final Composable<?> element : composables) {
             if (type.isInstance(element)) {
                 return (Optional<Y>) Optional.of(element);
             }
@@ -37,12 +31,12 @@ public class ResponseCompositionFragment implements Composables {
     }
 
     public ResponseCompositionFragment composedWith(final ResponseCompositionFragment other) {
-        List<Composable<?>> composed = new LinkedList<>();
-        for (Composable<?> entry : composables) {
+        final List<Composable<?>> composed = new LinkedList<>();
+        for (final Composable<?> entry : composables) {
             composed.add(entry.composedFrom(other));
         }
 
-        for (Composable<?> entry : other.composables) {
+        for (final Composable<?> entry : other.composables) {
             if (!get(entry.getClass()).isPresent()) {
                 composed.add(entry);
             }

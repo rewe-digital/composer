@@ -7,10 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 
-import com.rewedigital.composer.composing.CompositionStep;
 import com.rewedigital.composer.util.composable.ComposableRoot;
+import com.rewedigital.composer.util.composable.CompositionStep;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -43,8 +42,8 @@ public class ResponseComposition implements RequestEnricher {
         return new ResponseComposition(mappedRoots);
     }
 
-    public ResponseComposition composedWithFragmentFor(final Response<?> response) {
-        return this.composedWith(fragmentFor(response, CompositionStep.root(""))); // FIXME
+    public ResponseComposition composedWithFragmentFor(final Response<?> response, final String path) {
+        return this.composedWith(fragmentFor(response, CompositionStep.root(path)));
     }
 
     public ResponseCompositionFragment fragmentFor(final Response<?> response, final CompositionStep step) {
@@ -52,12 +51,6 @@ public class ResponseComposition implements RequestEnricher {
                 roots.values().stream()
                         .map(r -> r.composableFor(response, step))
                         .collect(toList()));
-    }
-
-    public CompletableFuture<ResponseComposition> composedWith(
-            final CompletableFuture<ResponseCompositionFragment> fragment) {
-        return fragment.thenApply(
-                f -> ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(f)).collect(toList())));
     }
 
     public ResponseComposition composedWith(

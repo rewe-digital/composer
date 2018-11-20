@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.rewedigital.composer.composing.CompositionStep;
 import com.rewedigital.composer.util.composable.ComposableRoot;
+import com.rewedigital.composer.util.composable.CompositionStep;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;

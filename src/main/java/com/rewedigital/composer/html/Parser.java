@@ -1,4 +1,4 @@
-package com.rewedigital.composer.parser;
+package com.rewedigital.composer.html;
 
 import java.util.Objects;
 

@@ -2,6 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.concurrent.CompletableFuture;
 
+import com.rewedigital.composer.util.composable.CompositionStep;
 import com.spotify.apollo.Response;
 
 /**

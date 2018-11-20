@@ -9,13 +9,13 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rewedigital.composer.util.composable.CompositionStep;
 import com.rewedigital.composer.util.response.ResponseCompositionFragment;
 import com.spotify.apollo.Response;
 
 /**
  * Describes the include parsed from a template. It contains the start and end
- * offsets of the include element in the template for further processing in a
- * {@link Composition}.
+ * offsets of the include element in the template for further processing.
  *
  * An included service can {@link #fetch(ContentFetcher, CompositionStep)} the
  * content using a {@link ContentFetcher} creating an instance of
@@ -24,7 +24,7 @@ import com.spotify.apollo.Response;
 public class IncludedFragment {
 
     public interface Composer {
-        CompletableFuture<ResponseCompositionFragment> compose(final Response<String> response, 
+        CompletableFuture<ResponseCompositionFragment> compose(final Response<String> response,
                 final CompositionStep parentStep);
     }
 
@@ -62,23 +62,14 @@ public class IncludedFragment {
     }
 
     public static class WithResponse {
-        private final int startOffset;
-        private final int endOffset;
         private final Response<String> response;
         private final CompositionStep step;
 
-        private WithResponse(final CompositionStep step, final int startOffset, final int endOffset,
-                final Response<String> response) {
-            this.startOffset = startOffset;
-            this.endOffset = endOffset;
+        private WithResponse(final CompositionStep step, final Response<String> response) {
             this.response = response;
             this.step = step;
 
             LOGGER.debug("included service response: {} received via {}", response, step);
-        }
-
-        public CompletableFuture<Composition> compose(final ContentComposer contentComposer) {
-            return contentComposer.composeContent(response, step).thenApply(c -> c.forRange(startOffset, endOffset));
         }
 
         public CompletableFuture<ResponseCompositionFragment> compose(final Composer composer) {
@@ -102,7 +93,7 @@ public class IncludedFragment {
             final CompositionStep parentStep) {
         final CompositionStep step = parentStep.childWith(path(), startOffset, endOffset);
         return fetcher.fetch(FetchContext.of(path(), fallback(), ttl()), step)
-                .thenApply(r -> new WithResponse(step, startOffset, endOffset, r));
+                .thenApply(r -> new WithResponse(step, r));
     }
 
     public boolean isInRage(final ContentRange contentRange) {
