@@ -10,8 +10,8 @@ import java.util.stream.Stream;
 
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
 import com.rewedigital.composer.composing.ContentRange;
-import com.rewedigital.composer.util.composable.ComposableRoot;
-import com.rewedigital.composer.util.composable.CompositionStep;
+import com.rewedigital.composer.response.ComposableRoot;
+import com.rewedigital.composer.response.CompositionStep;
 import com.spotify.apollo.Response;
 
 public class ComposableBodyRoot implements ComposableRoot<ComposableBody> {

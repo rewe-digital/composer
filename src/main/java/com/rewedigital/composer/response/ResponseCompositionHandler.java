@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.response;
+package com.rewedigital.composer.response;
 
 import java.util.concurrent.CompletionStage;
 

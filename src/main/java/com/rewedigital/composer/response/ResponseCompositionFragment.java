@@ -1,11 +1,8 @@
-package com.rewedigital.composer.util.response;
+package com.rewedigital.composer.response;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
-
-import com.rewedigital.composer.util.composable.Composable;
-import com.rewedigital.composer.util.composable.Composables;
 
 /**
  * Fragment of a {@link ResponseComposition}.

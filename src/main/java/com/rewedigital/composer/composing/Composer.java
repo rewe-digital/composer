@@ -6,10 +6,10 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import com.rewedigital.composer.util.composable.CompositionStep;
-import com.rewedigital.composer.util.response.ComposedResponse;
-import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseCompositionFragment;
+import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.response.ResponseCompositionFragment;
 import com.spotify.apollo.Response;
 
 public class Composer implements IncludedFragment.Composer, TemplateComposer {

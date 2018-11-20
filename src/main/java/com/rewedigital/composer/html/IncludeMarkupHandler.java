@@ -14,7 +14,7 @@ import org.attoparser.util.TextUtil;
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
 import com.rewedigital.composer.composing.ContentRange;
 import com.rewedigital.composer.composing.IncludedFragment;
-import com.rewedigital.composer.util.composable.CompositionStep;
+import com.rewedigital.composer.response.CompositionStep;
 
 public class IncludeMarkupHandler extends AbstractMarkupHandler {
 

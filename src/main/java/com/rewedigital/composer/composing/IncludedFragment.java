@@ -9,8 +9,8 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.rewedigital.composer.util.composable.CompositionStep;
-import com.rewedigital.composer.util.response.ResponseCompositionFragment;
+import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.response.ResponseCompositionFragment;
 import com.spotify.apollo.Response;
 
 /**

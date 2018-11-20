@@ -6,10 +6,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiFunction;
 
+import com.rewedigital.composer.application.RequestHandler;
+import com.rewedigital.composer.application.RequestHandlerFactory;
 import com.rewedigital.composer.caching.HttpCacheModule;
 import com.rewedigital.composer.client.ErrorHandlingClientDecoratingModule;
 import com.rewedigital.composer.client.WithIncomingHeadersClientDecoratingModule;
-import com.rewedigital.composer.proxy.ComposingRequestHandler;
 import com.rewedigital.composer.proxy.ProxyHeaderMiddleware;
 import com.spotify.apollo.AppInit;
 import com.spotify.apollo.Environment;
@@ -55,14 +56,14 @@ public class ComposerApplication {
         static void init(final Environment environment) {
             final Config configuration = withDefaults(environment.config());
 
-            final ComposingRequestHandler handler = RequestHandlerFactory.createRequestHandler(configuration);
+            final RequestHandler handler = RequestHandlerFactory.createRequestHandler(configuration);
 
             registerRoutes(environment, handler, "/");
             registerRoutes(environment, handler, "/<path:path>");
         }
 
 
-        private static void registerRoutes(final Environment environment, final ComposingRequestHandler handler,
+        private static void registerRoutes(final Environment environment, final RequestHandler handler,
             final String uri) {
             for (final String method : methods) {
                 environment.routingEngine().registerAutoRoute(

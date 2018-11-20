@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.composable;
+package com.rewedigital.composer.response;
 
 import java.util.Optional;
 

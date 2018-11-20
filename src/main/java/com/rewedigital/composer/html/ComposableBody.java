@@ -9,8 +9,8 @@ import java.util.stream.Stream;
 import com.rewedigital.composer.composing.ContentRange;
 import com.rewedigital.composer.composing.FragmentSource;
 import com.rewedigital.composer.composing.IncludedFragment;
-import com.rewedigital.composer.util.composable.Composable;
-import com.rewedigital.composer.util.composable.CompositionStep;
+import com.rewedigital.composer.response.Composable;
+import com.rewedigital.composer.response.CompositionStep;
 
 public class ComposableBody implements Composable<ComposableBody>, FragmentSource {
 

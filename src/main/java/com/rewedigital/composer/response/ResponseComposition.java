@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.response;
+package com.rewedigital.composer.response;
 
 import static com.rewedigital.composer.util.Combiners.throwingCombiner;
 import static java.util.stream.Collectors.toList;
@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import com.rewedigital.composer.util.composable.ComposableRoot;
-import com.rewedigital.composer.util.composable.CompositionStep;
-import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 

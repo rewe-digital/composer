@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.composable;
+package com.rewedigital.composer.response;
 
 /**
  * Describes a type of objects that can be merged with each other.

@@ -12,6 +12,7 @@ import java.util.concurrent.ExecutionException;
 import org.junit.Rule;
 import org.junit.Test;
 
+import com.rewedigital.composer.ComposerApplication;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 import com.spotify.apollo.StatusType;

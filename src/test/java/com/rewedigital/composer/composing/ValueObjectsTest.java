@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.junit.Test;
 
 import com.rewedigital.composer.html.Asset;
-import com.rewedigital.composer.util.composable.CompositionStep;
+import com.rewedigital.composer.response.CompositionStep;
 
 public class ValueObjectsTest {
 

@@ -2,7 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.Map;
 
-import com.rewedigital.composer.util.response.ResponseComposition;
+import com.rewedigital.composer.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.typesafe.config.Config;
 

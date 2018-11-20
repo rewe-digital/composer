@@ -1,25 +1,25 @@
-package com.rewedigital.composer.proxy;
+package com.rewedigital.composer.application;
 
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
+import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 
 import okio.ByteString;
 
-public class ComposingRequestHandler {
+public class RequestHandler {
 
     private final BackendRouting routing;
     private final RouteTypes routeTypes;
     private final ResponseCompositionHandler compositionHandler;
 
-    public ComposingRequestHandler(final BackendRouting routing, final RouteTypes routeTypes,
+    public RequestHandler(final BackendRouting routing, final RouteTypes routeTypes,
             final ResponseCompositionHandler compositionHandler) {
         this.routing = Objects.requireNonNull(routing);
         this.routeTypes = Objects.requireNonNull(routeTypes);

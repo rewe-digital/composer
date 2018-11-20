@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.response;
+package com.rewedigital.composer.response;
 
 import java.util.Objects;
 import java.util.function.Function;

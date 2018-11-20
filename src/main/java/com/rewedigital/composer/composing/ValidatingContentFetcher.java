@@ -9,8 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.damnhandy.uri.template.UriTemplate;
-import com.rewedigital.composer.util.composable.CompositionStep;
-import com.rewedigital.composer.util.request.RequestEnricher;
+import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.response.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;

@@ -24,9 +24,9 @@ import org.junit.Test;
 
 import com.rewedigital.composer.helper.ARequest;
 import com.rewedigital.composer.html.ComposableBodyRoot;
+import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
-import com.rewedigital.composer.util.response.ComposedResponse;
-import com.rewedigital.composer.util.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;

@@ -1,4 +1,4 @@
-package com.rewedigital.composer.util.request;
+package com.rewedigital.composer.response;
 
 import com.spotify.apollo.Request;
 

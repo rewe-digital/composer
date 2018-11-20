@@ -1,4 +1,4 @@
-package com.rewedigital.composer;
+package com.rewedigital.composer.application;
 
 import static java.util.Arrays.asList;
 
@@ -7,14 +7,13 @@ import java.util.concurrent.CompletionStage;
 import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
 import com.rewedigital.composer.html.ComposableBodyRoot;
-import com.rewedigital.composer.proxy.ComposingRequestHandler;
+import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.rewedigital.composer.session.SessionHandler;
-import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.RequestContext;
 import com.typesafe.config.Config;
 
@@ -39,7 +38,7 @@ public class RequestHandlerFactory {
         }
     }
 
-    public static ComposingRequestHandler createRequestHandler(final Config configuration) {
+    public static RequestHandler createRequestHandler(final Config configuration) {
         final Config routingConfig = configuration.getConfig("composer.routing");
         final Config htmlConfig = configuration.getConfig("composer.html");
         final Config sessionConfig = configuration.getConfig("composer.session");
@@ -52,6 +51,6 @@ public class RequestHandlerFactory {
         final SessionHandler sessionHandler = CookieBasedSessionHandler.create(sessionConfig);
         final ResponseCompositionHandler compositionHandler = new CompositionHandler(sessionHandler, htmlConfig);
 
-        return new ComposingRequestHandler(routing, routeTypes, compositionHandler);
+        return new RequestHandler(routing, routeTypes, compositionHandler);
     }
 }

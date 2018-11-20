@@ -15,17 +15,18 @@ import java.util.concurrent.CompletionStage;
 
 import org.junit.Test;
 
+import com.rewedigital.composer.application.RequestHandler;
 import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
 import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.util.response.ComposedResponse;
-import com.rewedigital.composer.util.response.ResponseComposition;
-import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -41,8 +42,8 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsResponseFromTemplateRoute() throws Exception {
-        final ComposingRequestHandler handler =
-            new ComposingRequestHandler(aRouter("/<path:path>", TEMPLATE),
+        final RequestHandler handler =
+            new RequestHandler(aRouter("/<path:path>", TEMPLATE),
                 RoutingResult.returning(Status.OK, SERVICE_RESPONSE),
                 sessionSerializer());
 
@@ -53,8 +54,8 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsDefaultResponseFromErrorOnTemplateRoute() throws Exception {
-        final ComposingRequestHandler handler =
-            new ComposingRequestHandler(aRouter("/<path:path>", TEMPLATE),
+        final RequestHandler handler =
+            new RequestHandler(aRouter("/<path:path>", TEMPLATE),
                 RoutingResult.returning(Status.BAD_REQUEST, ""),
                 sessionSerializer());
 
@@ -64,8 +65,8 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsErrorResponseFromProxyRoute() throws Exception {
-        final ComposingRequestHandler handler =
-            new ComposingRequestHandler(aRouter("/<path:path>", PROXY),
+        final RequestHandler handler =
+            new RequestHandler(aRouter("/<path:path>", PROXY),
                 RoutingResult.returning(Status.BAD_REQUEST, ""),
                 sessionSerializer());
 
