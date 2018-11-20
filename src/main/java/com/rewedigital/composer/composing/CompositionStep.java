@@ -3,25 +3,36 @@ package com.rewedigital.composer.composing;
 import java.util.Objects;
 
 /**
- * Describes a step in the composition process. The composition is done recursively, and steps are created root to leaf.
- * It is used to trace the progress of the recursive composition. The composition data itself is handled via
- * {@link Composition}.
+ * Describes a step in the composition process. The composition is done
+ * recursively, and steps are created root to leaf. It is used to trace the
+ * progress of the recursive composition. The composition data itself is handled
+ * via {@link Composition}.
  */
-class CompositionStep {
+public class CompositionStep {
 
-    private static final CompositionStep root = new CompositionStep(null, "", 0);
+    private static class Position {
+        private final int start;
+        private final int end;
+
+        private Position(final int start, final int end) {
+            this.start = start;
+            this.end = end;
+        }
+    }
 
     private final CompositionStep parent;
     private final String path;
     private final int depth;
+    private final Position position;
 
     public static CompositionStep root(final String path) {
-        return new CompositionStep(root, path, 0);
+        return new CompositionStep(null, path, new Position(-1, -1), 0);
     }
 
-    private CompositionStep(final CompositionStep parent, final String path, final int depth) {
+    private CompositionStep(final CompositionStep parent, final String path, final Position position, final int depth) {
         this.parent = parent;
         this.path = path;
+        this.position = position;
         this.depth = depth;
     }
 
@@ -29,13 +40,25 @@ class CompositionStep {
         return depth;
     }
 
-    public CompositionStep childWith(final String path) {
-        return new CompositionStep(this, path, depth + 1);
+    public int startOffset() {
+        return this.position.start;
+    }
+
+    public int endOffset() {
+        return this.position.end;
+    }
+
+    public boolean isRoot() {
+        return this.parent == null;
+    }
+
+    public CompositionStep childWith(final String path, final int startOffset, final int endOffset) {
+        return new CompositionStep(this, path, new Position(startOffset, endOffset), depth + 1);
     }
 
     public String callStack() {
-        if (this == root) {
-            return "[root]";
+        if (isRoot()) {
+            return "[" + path + "]";
         }
 
         return "[" + path + "] included via " + parent.callStack();
@@ -48,7 +71,7 @@ class CompositionStep {
 
     @Override
     public int hashCode() {
-        return Objects.hash(parent, path, depth);
+        return Objects.hash(parent, path, depth, position.start, position.end);
     }
 
     @Override
@@ -64,9 +87,10 @@ class CompositionStep {
         }
         final CompositionStep other = (CompositionStep) obj;
         return depth == other.depth &&
-            Objects.equals(path, other.path) &&
-            Objects.equals(parent, other.parent);
+                position.start == other.position.start &&
+                position.end == other.position.end &&
+                Objects.equals(path, other.path) &&
+                Objects.equals(parent, other.parent);
     }
-
 
 }

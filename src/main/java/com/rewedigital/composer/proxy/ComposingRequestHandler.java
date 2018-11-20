@@ -6,8 +6,6 @@ import java.util.concurrent.CompletionStage;
 
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
-import com.rewedigital.composer.util.response.ComposedResponse;
-import com.rewedigital.composer.util.response.ResponseComposition;
 import com.rewedigital.composer.util.response.ResponseCompositionHandler;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -19,31 +17,28 @@ public class ComposingRequestHandler {
 
     private final BackendRouting routing;
     private final RouteTypes routeTypes;
-    private final ResponseCompositionHandler extensionHandler;
+    private final ResponseCompositionHandler compositionHandler;
 
     public ComposingRequestHandler(final BackendRouting routing, final RouteTypes routeTypes,
-        final ResponseCompositionHandler extensionHandler) {
+            final ResponseCompositionHandler compositionHandler) {
         this.routing = Objects.requireNonNull(routing);
         this.routeTypes = Objects.requireNonNull(routeTypes);
-        this.extensionHandler = Objects.requireNonNull(extensionHandler);
+        this.compositionHandler = Objects.requireNonNull(compositionHandler);
 
     }
 
     public CompletionStage<Response<ByteString>> execute(final RequestContext context) {
-        return extensionHandler.initialize(context).thenCompose(extensions -> {
+        return compositionHandler.initializeFrom(context).thenCompose(composition -> {
             return routing.matches(context.request())
-                .map(rm -> rm.routeType(routeTypes)
-                    .execute(rm, context, extensions))
-                .orElse(defaultResponse(extensions))
-                .thenApply(response -> response.extendedResponse());
+                    .map(rm -> rm.routeType(routeTypes)
+                            .execute(rm, context, composition))
+                    .orElse(defaultResponse());
         });
     }
 
-    private static CompletableFuture<ComposedResponse<ByteString>> defaultResponse(
-        final ResponseComposition extensions) {
-        final Response<ByteString> response =
-            Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"));
-        return CompletableFuture
-            .completedFuture(new ComposedResponse<ByteString>(response, extensions));
+    private static CompletableFuture<Response<ByteString>> defaultResponse() {
+        final Response<ByteString> response = Response.of(Status.INTERNAL_SERVER_ERROR,
+                ByteString.encodeUtf8("Ohh.. noose!"));
+        return CompletableFuture.completedFuture(response);
     }
 }

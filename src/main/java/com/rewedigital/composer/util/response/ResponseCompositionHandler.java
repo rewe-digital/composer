@@ -10,6 +10,6 @@ import com.spotify.apollo.RequestContext;
  */
 public interface ResponseCompositionHandler {
 
-    public CompletionStage<ResponseComposition> initialize(final RequestContext context);
+    public CompletionStage<ResponseComposition> initializeFrom(final RequestContext context);
 
 }

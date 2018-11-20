@@ -12,6 +12,7 @@ import com.spotify.apollo.Response;
  */
 public interface TemplateComposer {
 
+    // FIXME change param to composed response
     CompletableFuture<ComposedResponse<String>> composeTemplate(Response<String> templateResponse,
         String templatePath);
 

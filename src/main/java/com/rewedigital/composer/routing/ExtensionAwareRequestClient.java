@@ -16,7 +16,8 @@ public class ExtensionAwareRequestClient {
     public CompletionStage<ComposedResponse<ByteString>> fetch(final RouteMatch rm, final RequestContext context,
             final ResponseComposition extension) {
         return context.requestScopedClient()
-                .send(extension.enrich(withTtl(Request.forUri(rm.expandedPath(), context.request().method()), rm.ttl())))
+                .send(extension
+                        .enrich(withTtl(Request.forUri(rm.expandedPath(), context.request().method()), rm.ttl())))
                 .thenApply(r -> new ComposedResponse<>(r, extension.composedWithFragmentFor(r)));
     }
 

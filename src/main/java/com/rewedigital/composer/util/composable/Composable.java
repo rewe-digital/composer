@@ -7,10 +7,10 @@ package com.rewedigital.composer.util.composable;
  */
 public interface Composable<T extends Composable<T>> {
 
-    public T mergedWith(final T other);
+    public T composedWith(final T other);
 
     @SuppressWarnings("unchecked")
-    default T mergedFrom(final Composables composables) {
-        return composables.get(this.getClass()).map(r -> this.mergedWith((T) r)).orElse((T) this);
+    default T composedFrom(final Composables composables) {
+        return composables.get(this.getClass()).map(r -> this.composedWith((T) r)).orElse((T) this);
     }
 }

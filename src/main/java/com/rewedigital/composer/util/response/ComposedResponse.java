@@ -12,26 +12,27 @@ import com.spotify.apollo.Response;
 public class ComposedResponse<T> {
 
     private final Response<T> response;
-    private final ResponseComposition extension;
+    private final ResponseComposition composition;
 
     public ComposedResponse(final Response<T> response, final ResponseComposition extension) {
         this.response = Objects.requireNonNull(response);
-        this.extension = Objects.requireNonNull(extension);
+        this.composition = Objects.requireNonNull(extension);
     }
 
+    // FIXME confusing when to use this vs composed response?
     public Response<T> response() {
         return response;
     }
 
-    public ResponseComposition extensions() {
-        return extension;
+    public ResponseComposition composition() {
+        return composition;
     }
 
     public <S> ComposedResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
-        return new ComposedResponse<S>(transformation.apply(response), extension);
+        return new ComposedResponse<S>(transformation.apply(response), composition);
     }
 
-    public Response<T> extendedResponse() {
-        return extension.writeTo(response);
+    public Response<T> composedResponse() {
+        return composition.writeTo(response);
     }
 }

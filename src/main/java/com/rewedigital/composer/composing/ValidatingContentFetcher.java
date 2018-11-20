@@ -17,7 +17,7 @@ import com.spotify.apollo.StatusType.Family;
 
 import okio.ByteString;
 
-class ValidatingContentFetcher implements ContentFetcher {
+public class ValidatingContentFetcher implements ContentFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidatingContentFetcher.class);
 

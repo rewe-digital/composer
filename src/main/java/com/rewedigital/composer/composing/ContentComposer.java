@@ -7,7 +7,7 @@ import com.spotify.apollo.Response;
 /**
  * Content composer provides the interface to execute the composition of a content fragment.
  */
-interface ContentComposer {
+public interface ContentComposer {
 
     CompletableFuture<Composition> composeContent(Response<String> contentResponse, CompositionStep step);
 

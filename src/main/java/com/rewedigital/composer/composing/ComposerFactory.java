@@ -19,9 +19,9 @@ public class ComposerFactory {
     }
 
     public TemplateComposer build(final Client client, final Map<String, Object> parsedPathArguments,
-            final ResponseComposition extensions) {
-        return new AttoParserBasedComposer(new ValidatingContentFetcher(client, parsedPathArguments, extensions),
-                extensions, configuration);
+            final ResponseComposition responseComposition) {
+        return new AttoParserBasedComposer(new ValidatingContentFetcher(client, parsedPathArguments, responseComposition),
+                responseComposition, configuration);
     }
 
 }

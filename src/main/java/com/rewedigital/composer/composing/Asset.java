@@ -10,7 +10,7 @@ import java.util.function.Predicate;
  * Describes a <code>link</code> or <code>script</code> tag found in an html <code>head</code> section during parsing of
  * a template or content fragment.
  */
-class Asset {
+public class Asset {
     public static class Builder {
 
         private final String optionsAttributeName;

@@ -15,7 +15,7 @@ import com.rewedigital.composer.util.composable.Composables;
 public class ResponseCompositionFragment implements Composables {
 
     private static final ResponseCompositionFragment empty = new ResponseCompositionFragment(Collections.emptyList());
-    
+
     private final List<Composable<?>> composables;
 
     ResponseCompositionFragment(final List<Composable<?>> composables) {
@@ -27,7 +27,7 @@ public class ResponseCompositionFragment implements Composables {
     }
 
     @SuppressWarnings("unchecked")
-    public <Y extends Composable<?>> Optional<Y> get(final Class<Y> type) {
+    public <Y> Optional<Y> get(final Class<Y> type) {
         for (Composable<?> element : composables) {
             if (type.isInstance(element)) {
                 return (Optional<Y>) Optional.of(element);
@@ -39,7 +39,7 @@ public class ResponseCompositionFragment implements Composables {
     public ResponseCompositionFragment composedWith(final ResponseCompositionFragment other) {
         List<Composable<?>> composed = new LinkedList<>();
         for (Composable<?> entry : composables) {
-            composed.add(entry.mergedFrom(other));
+            composed.add(entry.composedFrom(other));
         }
 
         for (Composable<?> entry : other.composables) {

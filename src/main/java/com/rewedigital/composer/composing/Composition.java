@@ -32,7 +32,7 @@ import com.rewedigital.composer.util.response.ResponseCompositionFragment;
  * Composition</li>
  * </ul>
  */
-class Composition {
+public class Composition {
 
     @FunctionalInterface
     public interface Extractor<T> {
@@ -49,13 +49,12 @@ class Composition {
 
     private Composition(final String template, final ContentRange contentRange, final List<Asset> assets,
             final List<Composition> children) {
-        this(0, template.length(), template, contentRange, assets, ResponseCompositionFragment.empty(),
-                children);
+        this(0, template.length(), template, contentRange, assets, ResponseCompositionFragment.empty(), children);
     }
 
     private Composition(final int startOffset, final int endOffset, final String template,
-            final ContentRange contentRange, final List<Asset> assets, 
-            final ResponseCompositionFragment extension, final List<Composition> children) {
+            final ContentRange contentRange, final List<Asset> assets, final ResponseCompositionFragment extension,
+            final List<Composition> children) {
         this.startOffset = startOffset;
         this.endOffset = endOffset;
         this.template = template;

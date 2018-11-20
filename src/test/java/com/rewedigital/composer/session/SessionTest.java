@@ -41,7 +41,7 @@ public class SessionTest {
         final SessionFragment secondSession =
             SessionFragment.of(Response.forStatus(Status.OK).withHeader("x-rd-second-key", "second-value"));
 
-        final SessionFragment result = firstSession.mergedWith(secondSession);
+        final SessionFragment result = firstSession.composedWith(secondSession);
 
         assertThat(result.get("first-key")).contains("first-value");
         assertThat(result.get("second-key")).contains("second-value");

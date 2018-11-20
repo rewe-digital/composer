@@ -43,7 +43,7 @@ import com.spotify.apollo.Response;
         return data.get(key);
     }
 
-    public SessionFragment mergedWith(final SessionFragment other) {
+    public SessionFragment composedWith(final SessionFragment other) {
         return new SessionFragment(data.mergedWith(other.data));
     }
 

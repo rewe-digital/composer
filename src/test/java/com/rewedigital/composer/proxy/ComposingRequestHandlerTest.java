@@ -96,7 +96,7 @@ public class ComposingRequestHandlerTest {
         return new ResponseCompositionHandler() {
 
             @Override
-            public CompletionStage<ResponseComposition> initialize(RequestContext context) {
+            public CompletionStage<ResponseComposition> initializeFrom(RequestContext context) {
                 return CompletableFuture.completedFuture(ResponseComposition.of(Collections.emptyList()));
             }
         };

@@ -5,17 +5,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import com.rewedigital.composer.composing.CompositionStep;
 import com.rewedigital.composer.util.composable.ComposableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
- * Describes the <em>root</em> session of a request. The root session is constructed from a data map, can be written as
- * a set of http headers to a request and can be updated ({@link #composedWith(SessionFragment)}) with data from a
- * {@link SessionFragment}. A root session is dirty if after a merge the data has changed.
+ * Describes the <em>root</em> session of a request. The root session is
+ * constructed from a data map, can be written as a set of http headers to a
+ * request and can be updated ({@link #composedWith(SessionFragment)}) with data
+ * from a {@link SessionFragment}. A root session is dirty if after a merge the
+ * data has changed.
  *
- * A root session can be written to a response using an instance of a {@link SessionRoot.Serializer}.
+ * A root session can be written to a response using an instance of a
+ * {@link SessionRoot.Serializer}.
  *
  */
 public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnricher {
@@ -26,7 +30,8 @@ public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnri
 
     private static final Serializer noopSerializer = new Serializer() {
         @Override
-        public <T> Response<T> writeTo(Response<T> response, Map<String, String> sessionData, boolean dirty) {
+        public <T> Response<T> writeTo(final Response<T> response, final Map<String, String> sessionData,
+                final boolean dirty) {
             return response;
         }
     };
@@ -60,6 +65,7 @@ public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnri
         return new SessionRoot(serializer, data, dirty);
     }
 
+    @Override
     public Request enrich(final Request request) {
         return request.withHeaders(asHeaders());
     }
@@ -72,10 +78,12 @@ public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnri
         return get(sessionIdKey);
     }
 
+    @Override
     public <T> Response<T> writtenTo(final Response<T> response) {
         return serializer.writeTo(response, asHeaders(), dirty);
     }
 
+    @Override
     public SessionRoot composedWith(final SessionFragment other) {
         final SessionData mergedData = data.mergedWith(other.data);
         final SessionData newData = getId().map(id -> mergedData.with(sessionIdKey, id)).orElse(mergedData);
@@ -105,7 +113,7 @@ public class SessionRoot implements ComposableRoot<SessionFragment>, RequestEnri
     }
 
     @Override
-    public SessionFragment composeableFor(Response<?> response) {
+    public SessionFragment composableFor(final Response<?> response, final CompositionStep step) {
         return SessionFragment.of(response);
     }
 

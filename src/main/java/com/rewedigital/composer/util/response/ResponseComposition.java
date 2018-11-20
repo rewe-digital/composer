@@ -7,7 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
+import com.rewedigital.composer.composing.CompositionStep;
 import com.rewedigital.composer.util.composable.ComposableRoot;
 import com.rewedigital.composer.util.request.RequestEnricher;
 import com.spotify.apollo.Request;
@@ -28,10 +30,10 @@ public class ResponseComposition implements RequestEnricher {
     }
 
     public static ResponseComposition of(final List<ComposableRoot<?>> roots) {
-        Map<Class<ComposableRoot<?>>, ComposableRoot<?>> mappedRoots = new HashMap<>();
-        for (ComposableRoot<?> root : roots) {
+        final Map<Class<ComposableRoot<?>>, ComposableRoot<?>> mappedRoots = new HashMap<>();
+        for (final ComposableRoot<?> root : roots) {
             @SuppressWarnings("unchecked")
-            Class<ComposableRoot<?>> type = (Class<ComposableRoot<?>>) root.getClass();
+            final Class<ComposableRoot<?>> type = (Class<ComposableRoot<?>>) root.getClass();
             if (mappedRoots.containsKey(type)) {
                 throw new IllegalArgumentException(
                         "each type of MergableRoot<> must only appear at most once in parameter roots!");
@@ -42,15 +44,24 @@ public class ResponseComposition implements RequestEnricher {
     }
 
     public ResponseComposition composedWithFragmentFor(final Response<?> response) {
-        return this.composedWith(fragmentFor(response));
+        return this.composedWith(fragmentFor(response, CompositionStep.root(""))); // FIXME
     }
 
-    public ResponseCompositionFragment fragmentFor(final Response<?> response) {
+    public ResponseCompositionFragment fragmentFor(final Response<?> response, final CompositionStep step) {
         return new ResponseCompositionFragment(
-                roots.values().stream().map(r -> r.composeableFor(response)).collect(toList()));
+                roots.values().stream()
+                        .map(r -> r.composableFor(response, step))
+                        .collect(toList()));
     }
 
-    public ResponseComposition composedWith(final ResponseCompositionFragment fragment) {
+    public CompletableFuture<ResponseComposition> composedWith(
+            final CompletableFuture<ResponseCompositionFragment> fragment) {
+        return fragment.thenApply(
+                f -> ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(f)).collect(toList())));
+    }
+
+    public ResponseComposition composedWith(
+            final ResponseCompositionFragment fragment) {
         return ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(fragment)).collect(toList()));
     }
 
@@ -60,7 +71,7 @@ public class ResponseComposition implements RequestEnricher {
     }
 
     @Override
-    public Request enrich(Request request) {
+    public Request enrich(final Request request) {
         return roots.values().stream().filter(RequestEnricher.class::isInstance).reduce(request,
                 (req, root) -> ((RequestEnricher) root).enrich(req), throwingCombiner());
     }

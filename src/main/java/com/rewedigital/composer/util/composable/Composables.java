@@ -7,5 +7,5 @@ import java.util.Optional;
  *
  */
 public interface Composables {
-    public <T extends Composable<?>> Optional<T> get(Class<T> type);
+    public <T> Optional<T> get(Class<T> type);
 }

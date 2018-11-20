@@ -38,7 +38,7 @@ public class SessionAwareProxyClientTest {
                 .toCompletableFuture()
                 .get();
 
-        final SessionRoot sessionRoot = templateResponse.extensions().get(SessionRoot.class).get();
+        final SessionRoot sessionRoot = templateResponse.composition().get(SessionRoot.class).get();
         assertThat(sessionRoot.get("key")).contains("value");
         assertThat(sessionRoot.get("response-key")).contains("other-value");
     }
