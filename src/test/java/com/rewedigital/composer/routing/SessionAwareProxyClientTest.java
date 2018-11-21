@@ -11,9 +11,9 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.Test;
 
 import com.rewedigital.composer.helper.Sessions;
+import com.rewedigital.composer.response.ComposingResponse;
+import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
-import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -33,12 +33,12 @@ public class SessionAwareProxyClientTest {
             Response.ok().withPayload(ByteString.EMPTY).withHeader("x-rd-response-key", "other-value");
 
         final RequestContext context = contextWith(aClient(expectedRequest, response), method);
-        final ExtendableResponse<ByteString> templateResponse =
-            new ExtensionAwareRequestClient().fetch(aRouteMatch(), context, session("x-rd-key", "value"))
+        final ComposingResponse<ByteString> templateResponse =
+            new CompositionAwareRequestClient().fetch(aRouteMatch(), context, session("x-rd-key", "value"))
                 .toCompletableFuture()
                 .get();
 
-        final SessionRoot sessionRoot = templateResponse.extensions().get(SessionRoot.class).get();
+        final SessionRoot sessionRoot = templateResponse.getComposition(SessionRoot.class).get();
         assertThat(sessionRoot.get("key")).contains("value");
         assertThat(sessionRoot.get("response-key")).contains("other-value");
     }
@@ -63,7 +63,7 @@ public class SessionAwareProxyClientTest {
         return client;
     }
 
-    private ResponseExtension session(final String key, final String value) {
-        return ResponseExtension.of(asList(Sessions.sessionRoot(key, value)));
+    private ResponseComposition session(final String key, final String value) {
+        return ResponseComposition.of(asList(Sessions.sessionRoot(key, value)));
     }
 }

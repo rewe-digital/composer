@@ -2,7 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.Objects;
 
-class ContentRange {
+public class ContentRange {
 
     private final int start;
     private final int end;

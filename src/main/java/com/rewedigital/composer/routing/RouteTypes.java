@@ -10,9 +10,9 @@ import com.rewedigital.composer.composing.ComposerFactory;
 public class RouteTypes {
 
     private final ComposerFactory composerFactory;
-    private final ExtensionAwareRequestClient templateClient;
+    private final CompositionAwareRequestClient templateClient;
 
-    public RouteTypes(final ComposerFactory composerFactory, final ExtensionAwareRequestClient templateClient) {
+    public RouteTypes(final ComposerFactory composerFactory, final CompositionAwareRequestClient templateClient) {
         this.templateClient = Objects.requireNonNull(templateClient);
         this.composerFactory = Objects.requireNonNull(composerFactory);
     }

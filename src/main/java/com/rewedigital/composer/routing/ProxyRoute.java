@@ -3,26 +3,27 @@ package com.rewedigital.composer.routing;
 import java.util.Objects;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.response.ResponseComposition;
 import com.spotify.apollo.RequestContext;
+import com.spotify.apollo.Response;
 
 import okio.ByteString;
 
 /**
- * {@link RouteType} <em>proxy</em> just proxies the request to the routing target.
+ * {@link RouteType} <em>proxy</em> just proxies the request to the routing
+ * target.
  */
 public class ProxyRoute implements RouteType {
 
-    private final ExtensionAwareRequestClient templateClient;
+    private final CompositionAwareRequestClient templateClient;
 
-    public ProxyRoute(final ExtensionAwareRequestClient templateClient) {
+    public ProxyRoute(final CompositionAwareRequestClient templateClient) {
         this.templateClient = Objects.requireNonNull(templateClient);
     }
 
     @Override
-    public CompletionStage<ExtendableResponse<ByteString>> execute(final RouteMatch rm, final RequestContext context,
-        final ResponseExtension extension) {
-        return templateClient.fetch(rm, context, extension);
+    public CompletionStage<Response<ByteString>> execute(final RouteMatch rm, final RequestContext context,
+            final ResponseComposition composition) {
+        return templateClient.fetch(rm, context, composition).thenApply(r -> r.composedResponse());
     }
 }

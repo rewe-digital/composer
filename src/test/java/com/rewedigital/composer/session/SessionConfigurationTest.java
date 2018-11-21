@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.rewedigital.composer.session.LocalSessionIdInterceptor;
 import com.rewedigital.composer.session.SessionConfiguration;
 import com.typesafe.config.Config;

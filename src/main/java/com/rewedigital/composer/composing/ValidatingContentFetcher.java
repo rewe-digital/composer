@@ -9,7 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.damnhandy.uri.template.UriTemplate;
-import com.rewedigital.composer.util.request.RequestEnricher;
+import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.response.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -17,23 +18,30 @@ import com.spotify.apollo.StatusType.Family;
 
 import okio.ByteString;
 
-class ValidatingContentFetcher implements ContentFetcher {
+public class ValidatingContentFetcher implements ContentFetcher {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ValidatingContentFetcher.class);
 
     private final Client client;
     private final Map<String, Object> parsedPathArguments;
     private final RequestEnricher requestEnricher;
+    private final int maxRecursion;
 
     public ValidatingContentFetcher(final Client client, final Map<String, Object> parsedPathArguments,
-        final RequestEnricher requestEnricher) {
+            final RequestEnricher requestEnricher, final int maxRecursion) {
         this.requestEnricher = requireNonNull(requestEnricher);
         this.client = requireNonNull(client);
         this.parsedPathArguments = requireNonNull(parsedPathArguments);
+        this.maxRecursion = maxRecursion;
     }
 
     @Override
     public CompletableFuture<Response<String>> fetch(final FetchContext context, final CompositionStep step) {
+        if (maxRecursion < step.depth()) {
+            LOGGER.warn("Max recursion depth exceeded for " + step.callStack());
+            return CompletableFuture.completedFuture(Response.forPayload(context.fallback()));
+        }
+
         if (context.hasEmptyPath()) {
             LOGGER.warn("Empty path attribute in include found - callstack: " + step.callStack());
             return CompletableFuture.completedFuture(Response.forPayload(""));

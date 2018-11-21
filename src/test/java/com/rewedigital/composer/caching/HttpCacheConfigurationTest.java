@@ -2,7 +2,7 @@ package com.rewedigital.composer.caching;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.typesafe.config.ConfigException;
 import com.typesafe.config.ConfigValueFactory;
 

@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 
+import com.rewedigital.composer.caching.CacheControlComposer;
 import com.squareup.okhttp.CacheControl;
 
 public class CacheControlComposerTest {

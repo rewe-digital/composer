@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.rewedigital.composer.session.SessionConfiguration;
 import com.rewedigital.composer.session.SessionHandler;

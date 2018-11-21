@@ -2,14 +2,14 @@ package com.rewedigital.composer.routing;
 
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.util.response.ExtendableResponse;
-import com.rewedigital.composer.util.response.ResponseExtension;
+import com.rewedigital.composer.response.ResponseComposition;
 import com.spotify.apollo.RequestContext;
+import com.spotify.apollo.Response;
 
 import okio.ByteString;
 
 public interface RouteType {
 
-    CompletionStage<ExtendableResponse<ByteString>> execute(final RouteMatch rm, final RequestContext context,
-        final ResponseExtension extensions);
+    CompletionStage<Response<ByteString>> execute(final RouteMatch rm, final RequestContext context,
+            final ResponseComposition composition);
 }
