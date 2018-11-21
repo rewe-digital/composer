@@ -1,4 +1,4 @@
-package com.rewedigital.composer.proxy;
+package com.rewedigital.composer.application;
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -14,6 +14,7 @@ import org.hamcrest.TypeSafeMatcher;
 import org.junit.Test;
 import org.mockito.Mockito;
 
+import com.rewedigital.composer.application.ProxyHeaderMiddleware;
 import com.rewedigital.composer.helper.ARequest;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;

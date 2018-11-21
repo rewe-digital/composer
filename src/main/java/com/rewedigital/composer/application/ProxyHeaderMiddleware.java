@@ -1,4 +1,4 @@
-package com.rewedigital.composer.proxy;
+package com.rewedigital.composer.application;
 
 import static com.rewedigital.composer.util.Combiners.throwingCombiner;
 
