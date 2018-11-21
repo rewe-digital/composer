@@ -39,20 +39,19 @@ public class ResponseComposition implements RequestEnricher {
         return new ResponseComposition(mappedRoots);
     }
 
-    public ResponseCompositionFragment fragmentFor(final Response<?> response, final CompositionStep step) {
+    ResponseCompositionFragment fragmentFor(final Response<?> response, final CompositionStep step) {
         return new ResponseCompositionFragment(
                 roots.values().stream()
                         .map(r -> r.composableFor(response, step))
                         .collect(toList()));
     }
 
-    public ResponseComposition composedWith(
-            final ResponseCompositionFragment fragment) {
+    ResponseComposition composedWith(final ResponseCompositionFragment fragment) {
         return ResponseComposition.of(roots.values().stream().map(r -> r.composedFrom(fragment)).collect(toList()));
     }
 
     @SuppressWarnings("unchecked")
-    public <Y extends ComposableRoot<?>> Optional<Y> get(final Class<Y> type) {
+    <Y extends ComposableRoot<?>> Optional<Y> get(final Class<Y> type) {
         return Optional.ofNullable((Y) roots.get(type));
     }
 
@@ -62,7 +61,7 @@ public class ResponseComposition implements RequestEnricher {
                 (req, root) -> ((RequestEnricher) root).enrich(req), throwingCombiner());
     }
 
-    public <P> Response<P> writeTo(final Response<P> response) {
+    <P> Response<P> writeTo(final Response<P> response) {
         return roots.values().stream().reduce(response, (resp, root) -> root.writtenTo(resp), throwingCombiner());
     }
 }

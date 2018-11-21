@@ -7,7 +7,6 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.html.Asset;
 import com.rewedigital.composer.response.CompositionStep;
 
 public class ValueObjectsTest {
@@ -32,19 +31,6 @@ public class ValueObjectsTest {
         final FetchContext fifth = FetchContext.of("/", "/fallback", Optional.of(Duration.ofMillis(1000)));
 
         assertIsValueObject(first, second, third, forth, fifth);
-    }
-
-    @Test
-    public void asset_is_value_object() {
-        final Asset first = new Asset.Builder("xyz").attribute("first_attr", "first_value").type("test").build();
-        final Asset second = new Asset.Builder("xyz").attribute("first_attr", "first_value").type("test").build();
-        final Asset third = new Asset.Builder("xyz").attribute("third_attr", "first_value").type("test").build();
-        final Asset forth = new Asset.Builder("xyz").attribute("first_attr", "first_value")
-                .attribute("other_attr", "other_value").type("test").build();
-        final Asset fifth = new Asset.Builder("xyz").attribute("first_attr", "first_value").type("other").build();
-        final Asset sixth = new Asset.Builder("xyz").attribute("first_attr", "first_value").type("test").selfClosing(true).build();
-        
-        assertIsValueObject(first, second, third, forth, fifth, sixth);
     }
     
     @Test

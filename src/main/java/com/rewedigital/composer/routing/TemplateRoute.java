@@ -35,8 +35,7 @@ public class TemplateRoute implements RouteType {
         return templateClient.fetch(rm, context, extensions)
                 .thenCompose(
                         templateResponse -> process(context.requestScopedClient(), rm.parsedPathArguments(),
-                                templateResponse,
-                                rm.expandedPath()));
+                                templateResponse, rm.expandedPath()));
     }
 
     private CompletionStage<Response<ByteString>> process(final Client client,
@@ -49,13 +48,13 @@ public class TemplateRoute implements RouteType {
                         .thenApply(r -> r.composedResponse())
                         // TODO compose cache-control header
                         .thenApply(r -> r.withHeader("Cache-Control", "no-store,max-age=0"))
-                        .thenApply(this::toByteString))
+                        .thenApply(this::toByteStringPayload))
                 .orElseGet(() -> CompletableFuture.completedFuture(
                         // TODO proper error handling
                         Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"))));
     }
 
-    private Response<ByteString> toByteString(final Response<String> response) {
+    private Response<ByteString> toByteStringPayload(final Response<String> response) {
         return response.withPayload(response.payload().map(ByteString::encodeUtf8).orElse(ByteString.EMPTY));
     }
 }

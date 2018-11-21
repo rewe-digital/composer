@@ -9,7 +9,7 @@ import org.attoparser.ParseException;
 import org.attoparser.config.ParseConfiguration;
 import org.attoparser.config.ParseConfiguration.ElementBalancing;
 
-public class Parser {
+class Parser {
 
     private static final IMarkupParser _PARSER = new MarkupParser(parserConfig());
     public static final Parser PARSER = new Parser();

@@ -13,7 +13,7 @@ import com.rewedigital.composer.composing.IncludedFragment;
 import com.rewedigital.composer.response.Composable;
 import com.rewedigital.composer.response.CompositionStep;
 
-public class ComposableBody implements Composable<ComposableBody>, FragmentSource {
+class ComposableBody implements Composable<ComposableBody>, FragmentSource {
 
     private static final ComposableBody empty = ComposableBody.of(CompositionStep.empty(), "",
             ContentRange.empty(), Collections.emptyList(), Collections.emptyList());

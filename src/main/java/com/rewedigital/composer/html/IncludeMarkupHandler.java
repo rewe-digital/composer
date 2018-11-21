@@ -16,7 +16,7 @@ import com.rewedigital.composer.composing.ContentRange;
 import com.rewedigital.composer.composing.IncludedFragment;
 import com.rewedigital.composer.response.CompositionStep;
 
-public class IncludeMarkupHandler extends AbstractMarkupHandler {
+class IncludeMarkupHandler extends AbstractMarkupHandler {
 
     private final char[] includeTag;
 

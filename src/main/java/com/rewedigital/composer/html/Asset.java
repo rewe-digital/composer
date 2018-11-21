@@ -10,7 +10,7 @@ import java.util.function.Predicate;
  * Describes a <code>link</code> or <code>script</code> tag found in an html <code>head</code> section during parsing of
  * a template or content fragment.
  */
-public class Asset {
+class Asset {
     public static class Builder {
 
         private final String optionsAttributeName;
@@ -87,12 +87,15 @@ public class Asset {
 
     @Override
     public boolean equals(final Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         final Asset other = (Asset) obj;
         return selfClosing == other.selfClosing &&
             Objects.equals(attributes, other.attributes) &&
