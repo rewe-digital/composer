@@ -40,8 +40,8 @@ public class ComposingResponse<T> {
         return composition.fragmentFor(response, step);
     }
 
-    public ResponseComposition composition() {
-        return composition;
+    public <S extends ComposableRoot<?>> Optional<S> getComposition(final Class<S> type) {
+        return composition.get(type);
     }
 
     public Response<T> composedResponse() {

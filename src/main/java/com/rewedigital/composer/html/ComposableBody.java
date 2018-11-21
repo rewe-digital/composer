@@ -4,6 +4,7 @@ import java.io.StringWriter;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.rewedigital.composer.composing.ContentRange;
@@ -30,14 +31,16 @@ public class ComposableBody implements Composable<ComposableBody>, FragmentSourc
 
     public static ComposableBody of(final CompositionStep step, final String template,
             final ContentRange contentRange, final List<IncludedFragment> includedFragments, final List<Asset> assets) {
-        return new ComposableBody(step, template, contentRange, includedFragments, assets, Collections.emptyList());
+        return new ComposableBody(step, template, contentRange, includedFragments, assets,
+                Collections.emptyList());
     }
 
     private ComposableBody(final CompositionStep step, final String template, final ContentRange contentRange,
             final List<IncludedFragment> includedFragments, final List<Asset> assets,
             final List<ComposableBody> children) {
+        this.includedFragments = includedFragments.stream().filter(f -> f.isInRage(contentRange))
+                .collect(Collectors.toList());
         this.step = step;
-        this.includedFragments = includedFragments;
         this.assets = assets;
         this.template = template;
         this.contentRange = contentRange;

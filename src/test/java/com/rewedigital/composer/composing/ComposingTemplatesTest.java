@@ -201,7 +201,7 @@ public class ComposingTemplatesTest {
         newComposer = makeNewComposer(client, template);
         final ComposingResponse<String> result = newComposer.composeTemplate().get();
         response = result.composedResponse();
-        session = result.composition().get(SessionRoot.class).get();
+        session = result.getComposition(SessionRoot.class).get();
     }
 
     private void then_the_result_should_be(final String bodyContent) {
