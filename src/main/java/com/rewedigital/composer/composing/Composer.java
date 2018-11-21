@@ -8,36 +8,34 @@ import java.util.stream.Stream;
 
 import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.CompositionStep;
-import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.response.ResponseCompositionFragment;
-import com.spotify.apollo.Response;
 
 public class Composer implements IncludedFragment.Composer, TemplateComposer {
 
     private final ContentFetcher contentFetcher;
-    private final ResponseComposition responseComposition;
+    private final ComposingResponse<String> composingResponse;
+    private final String path;
 
-    public Composer(final ContentFetcher contentFetcher, final ResponseComposition responseComposition) {
-        this.contentFetcher = contentFetcher;
-        this.responseComposition = responseComposition;
-    }
-
-    @Override
-    public CompletableFuture<ComposingResponse<String>> composeTemplate(final Response<String> templateResponse,
+    public Composer(final ContentFetcher contentFetcher, final ComposingResponse<String> composingResponse,
             final String path) {
-        return compose(templateResponse, CompositionStep.root(path))
-                .thenApply(fragment -> responseComposition.composedWith(fragment))
-                .thenApply(composition -> new ComposingResponse<>(templateResponse, composition))
-                .thenApply(r -> r.transform(s -> s.withHeader("Cache-Control", "no-store,max-age=0")));
+        this.contentFetcher = contentFetcher;
+        this.composingResponse = composingResponse;
+        this.path = path;
     }
 
     @Override
-    public CompletableFuture<ResponseCompositionFragment> compose(final Response<String> response,
+    public CompletableFuture<ComposingResponse<String>> composeTemplate() {
+        return compose(composingResponse, CompositionStep.root(path))
+                .thenApply(fragment -> composingResponse.composedWith(fragment));
+    }
+
+    @Override
+    public CompletableFuture<ResponseCompositionFragment> compose(final ComposingResponse<String> response,
             final CompositionStep step) {
-        final ResponseCompositionFragment fragment = responseComposition.fragmentFor(response, step);
+        final ResponseCompositionFragment fragment = response.fragmentFor(step);
         return includesIn(fragment)
                 .map(include -> include.fetch(contentFetcher, step)
-                        .thenCompose(content -> content.compose(this)))
+                        .thenCompose(content -> content.compose(this, response)))
                 .reduce(completedFuture(fragment), (a, b) -> a
                         .thenCombine(b, (x, y) -> x.composedWith(y)));
     }

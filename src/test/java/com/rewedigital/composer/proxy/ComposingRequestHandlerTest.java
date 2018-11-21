@@ -42,8 +42,7 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsResponseFromTemplateRoute() throws Exception {
-        final RequestHandler handler =
-            new RequestHandler(aRouter("/<path:path>", TEMPLATE),
+        final RequestHandler handler = new RequestHandler(aRouter("/<path:path>", TEMPLATE),
                 RoutingResult.returning(Status.OK, SERVICE_RESPONSE),
                 sessionSerializer());
 
@@ -54,8 +53,7 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsDefaultResponseFromErrorOnTemplateRoute() throws Exception {
-        final RequestHandler handler =
-            new RequestHandler(aRouter("/<path:path>", TEMPLATE),
+        final RequestHandler handler = new RequestHandler(aRouter("/<path:path>", TEMPLATE),
                 RoutingResult.returning(Status.BAD_REQUEST, ""),
                 sessionSerializer());
 
@@ -65,8 +63,7 @@ public class ComposingRequestHandlerTest {
 
     @Test
     public void returnsErrorResponseFromProxyRoute() throws Exception {
-        final RequestHandler handler =
-            new RequestHandler(aRouter("/<path:path>", PROXY),
+        final RequestHandler handler = new RequestHandler(aRouter("/<path:path>", PROXY),
                 RoutingResult.returning(Status.BAD_REQUEST, ""),
                 sessionSerializer());
 
@@ -97,7 +94,7 @@ public class ComposingRequestHandlerTest {
         return new ResponseCompositionHandler() {
 
             @Override
-            public CompletionStage<ResponseComposition> initializeFrom(RequestContext context) {
+            public CompletionStage<ResponseComposition> initializeFrom(final RequestContext context) {
                 return CompletableFuture.completedFuture(ResponseComposition.of(Collections.emptyList()));
             }
         };
@@ -110,9 +107,10 @@ public class ComposingRequestHandlerTest {
             return new RouteTypes(composerFactory(), new CompositionAwareRequestClient() {
                 @Override
                 public CompletionStage<ComposingResponse<ByteString>> fetch(final RouteMatch rm,
-                    final RequestContext context, final ResponseComposition extension) {
+                        final RequestContext context, final ResponseComposition extension) {
                     return CompletableFuture.completedFuture(
-                        new ComposingResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
+                            new ComposingResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)),
+                                    extension));
                 }
             });
         }

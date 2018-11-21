@@ -39,10 +39,6 @@ public class ResponseComposition implements RequestEnricher {
         return new ResponseComposition(mappedRoots);
     }
 
-    public ResponseComposition composedWithFragmentFor(final Response<?> response, final String path) {
-        return this.composedWith(fragmentFor(response, CompositionStep.root(path)));
-    }
-
     public ResponseCompositionFragment fragmentFor(final Response<?> response, final CompositionStep step) {
         return new ResponseCompositionFragment(
                 roots.values().stream()

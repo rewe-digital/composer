@@ -1,9 +1,12 @@
 package com.rewedigital.composer.response;
 
 import java.util.Objects;
-import java.util.function.Function;
+import java.util.Optional;
 
 import com.spotify.apollo.Response;
+import com.spotify.apollo.Status;
+
+import okio.ByteString;
 
 /**
  * Holds a response with payload of type <code>T</code> and extending data via
@@ -16,7 +19,8 @@ public class ComposingResponse<T> {
 
     public static <T> ComposingResponse<T> composedFrom(final Response<T> response,
             final ResponseComposition composition, final String path) {
-        return new ComposingResponse<>(response, composition.composedWithFragmentFor(response, path));
+        final ResponseCompositionFragment fragment = composition.fragmentFor(response, CompositionStep.root(path));
+        return new ComposingResponse<>(response, composition).composedWith(fragment);
     }
 
     public ComposingResponse(final Response<T> response, final ResponseComposition composition) {
@@ -24,20 +28,37 @@ public class ComposingResponse<T> {
         this.composition = Objects.requireNonNull(composition);
     }
 
-    // FIXME confusing when to use this vs composed response?
-    public Response<T> response() {
-        return response;
+    public ComposingResponse<T> composedWith(final ResponseCompositionFragment fragment) {
+        return new ComposingResponse<>(response, composition.composedWith(fragment));
+    }
+
+    public ComposingResponse<T> withResponse(final Response<T> response) {
+        return new ComposingResponse<>(response, composition);
+    }
+
+    public ResponseCompositionFragment fragmentFor(final CompositionStep step) {
+        return composition.fragmentFor(response, step);
     }
 
     public ResponseComposition composition() {
         return composition;
     }
 
-    public <S> ComposingResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
-        return new ComposingResponse<S>(transformation.apply(response), composition);
-    }
-
     public Response<T> composedResponse() {
         return composition.writeTo(response);
+    }
+
+    public RequestEnricher requestEnricher() {
+        return composition;
+    }
+
+    public Optional<ComposingResponse<String>> toComposablePayload() {
+        return response.payload()
+                .filter(__ -> response.status().code() == Status.OK.code())
+                .filter(ByteString.class::isInstance)
+                .map(ByteString.class::cast)
+                .map(ByteString::utf8)
+                .map(response::withPayload)
+                .map(r -> new ComposingResponse<>(r, composition));
     }
 }

@@ -6,13 +6,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
 
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.rewedigital.composer.ComposerApplication;
 import com.spotify.apollo.Response;
 import com.spotify.apollo.Status;
 import com.spotify.apollo.StatusType;
@@ -41,6 +41,12 @@ public class ComposerTest {
 
         final CompletionStage<Response<ByteString>> composedFuture = serviceHelper.request("GET", "/compose");
         assertThat(responseBody(composedFuture)).isEqualTo(expectedComposedResponse());
+        assertThat(cacheControlHeader(composedFuture)).contains("no-store,max-age=0");
+    }
+
+    private Optional<String> cacheControlHeader(final CompletionStage<Response<ByteString>> composedFuture)
+            throws Exception {
+        return composedFuture.toCompletableFuture().get().header("Cache-Control");
     }
 
     @Test

@@ -111,13 +111,6 @@ public class ComposingTemplatesTest {
     }
 
     @Test
-    public void sets_no_store_cache_header_if_no_cache_header_from_composition() throws Exception {
-        given_first_downstream_call_returns_in_body("content");
-        when_composing_a_template("template content <include path=\"http://mock/\"></include> more content");
-        then_the_result_should_have_the_header("Cache-Control", "no-store,max-age=0");
-    }
-
-    @Test
     public void limits_depth_of_recursive_downstream_calls() throws Exception {
         given_a_max_recursion_depth_of(1);
         given_first_downstream_call_returns_in_body(
@@ -205,8 +198,8 @@ public class ComposingTemplatesTest {
 
     private void when_composing_a_template(final Response<String> template) throws Exception {
         client = makeClient();
-        newComposer = makeNewComposer(client);
-        final ComposingResponse<String> result = newComposer.composeTemplate(template, "template-path").get();
+        newComposer = makeNewComposer(client, template);
+        final ComposingResponse<String> result = newComposer.composeTemplate().get();
         response = result.composedResponse();
         session = result.composition().get(SessionRoot.class).get();
     }
@@ -218,10 +211,6 @@ public class ComposingTemplatesTest {
     private void then_the_result_should_not_contain(final String value) {
         assertThat(response.payload()).doesNotHave(
                 new Condition<>(v -> v.isPresent() && v.get().contains(value), "value containing %s", value));
-    }
-
-    private void then_the_result_should_have_the_header(final String name, final String value) {
-        assertThat(response.header(name)).contains(value);
     }
 
     private void then_the_downstream_call_should_be_made_with(final Matcher<Request> matcher) {
@@ -236,15 +225,16 @@ public class ComposingTemplatesTest {
         assertThat(session.isDirty()).isTrue();
     }
 
-    private Composer makeNewComposer(final Client client) {
+    private Composer makeNewComposer(final Client client, final Response<String> template) {
         final ComposerHtmlConfiguration configuration = new ComposerHtmlConfiguration("include", "content",
                 "data-rd-options", maxRecursionDepth);
         final ResponseComposition responseComposition = ResponseComposition
                 .of(Arrays.asList(ComposableBodyRoot.of(configuration), SessionRoot.empty()));
+        final ComposingResponse<String> composingResponse = new ComposingResponse<>(template, responseComposition);
         final ContentFetcher contentFetcher = new ValidatingContentFetcher(client, Collections.emptyMap(),
                 responseComposition,
                 configuration.maxRecursion());
-        return new Composer(contentFetcher, responseComposition);
+        return new Composer(contentFetcher, composingResponse, "template-path");
     }
 
     private Client makeClient() {

@@ -9,6 +9,7 @@ import java.util.concurrent.CompletableFuture;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.CompositionStep;
 import com.rewedigital.composer.response.ResponseCompositionFragment;
 import com.spotify.apollo.Response;
@@ -24,7 +25,7 @@ import com.spotify.apollo.Response;
 public class IncludedFragment {
 
     public interface Composer {
-        CompletableFuture<ResponseCompositionFragment> compose(final Response<String> response,
+        CompletableFuture<ResponseCompositionFragment> compose(final ComposingResponse<String> response,
                 final CompositionStep parentStep);
     }
 
@@ -72,8 +73,9 @@ public class IncludedFragment {
             LOGGER.debug("included service response: {} received via {}", response, step);
         }
 
-        public CompletableFuture<ResponseCompositionFragment> compose(final Composer composer) {
-            return composer.compose(response, step);
+        public CompletableFuture<ResponseCompositionFragment> compose(final Composer composer,
+                final ComposingResponse<String> parent) {
+            return composer.compose(parent.withResponse(response), step);
         }
     }
 

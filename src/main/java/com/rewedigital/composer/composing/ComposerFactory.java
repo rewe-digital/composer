@@ -2,7 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.Map;
 
-import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.spotify.apollo.Client;
 import com.typesafe.config.Config;
 
@@ -18,12 +18,13 @@ public class ComposerFactory {
         this.configuration = ComposerHtmlConfiguration.fromConfig(configuration);
     }
 
-    public TemplateComposer build(final Client client, final Map<String, Object> parsedPathArguments,
-            final ResponseComposition responseComposition) {
-        return new Composer(
-                new ValidatingContentFetcher(client, parsedPathArguments, responseComposition,
-                        configuration.maxRecursion()),
-                responseComposition);
+    public TemplateComposer build(final Client client, final String path, final Map<String, Object> parsedPathArguments,
+            final ComposingResponse<String> composingResponse) {
+
+        final ValidatingContentFetcher contentFetcher = new ValidatingContentFetcher(client, parsedPathArguments,
+                composingResponse.requestEnricher(), configuration.maxRecursion());
+
+        return new Composer(contentFetcher, composingResponse, path);
     }
 
 }

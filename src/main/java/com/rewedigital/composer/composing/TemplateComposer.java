@@ -3,7 +3,6 @@ package com.rewedigital.composer.composing;
 import java.util.concurrent.CompletableFuture;
 
 import com.rewedigital.composer.response.ComposingResponse;
-import com.spotify.apollo.Response;
 
 /**
  * <code>TemplateComposer</code> provides the interface to execute the main purpose of <em>Composer</em>: Composing a
@@ -12,6 +11,5 @@ import com.spotify.apollo.Response;
  */
 public interface TemplateComposer {
 
-    CompletableFuture<ComposingResponse<String>> composeTemplate(Response<String> templateResponse,
-        String templatePath);
+    CompletableFuture<ComposingResponse<String>> composeTemplate();
 }

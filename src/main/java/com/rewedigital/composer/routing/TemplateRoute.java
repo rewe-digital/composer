@@ -42,26 +42,20 @@ public class TemplateRoute implements RouteType {
     private CompletionStage<Response<ByteString>> process(final Client client,
             final Map<String, Object> pathArguments, final ComposingResponse<ByteString> templateResponse,
             final String path) {
-        final Response<ByteString> response = templateResponse.response();
 
-        if (isError(response)) {
-            // TODO: implement proper error handling
-            return CompletableFuture
-                    .completedFuture(Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!")));
-        }
-
-        return composerFactory
-                .build(client, pathArguments, templateResponse.composition())
-                .composeTemplate(response.withPayload(response.payload().get().utf8()), path)
-                .thenApply(r -> r.composedResponse())
-                .thenApply(this::toByteString);
+        return templateResponse.toComposablePayload()
+                .map(template -> composerFactory.build(client, path, pathArguments, template)
+                        .composeTemplate()
+                        .thenApply(r -> r.composedResponse())
+                        // TODO compose cache-control header
+                        .thenApply(r -> r.withHeader("Cache-Control", "no-store,max-age=0"))
+                        .thenApply(this::toByteString))
+                .orElseGet(() -> CompletableFuture.completedFuture(
+                        // TODO proper error handling
+                        Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"))));
     }
 
     private Response<ByteString> toByteString(final Response<String> response) {
         return response.withPayload(response.payload().map(ByteString::encodeUtf8).orElse(ByteString.EMPTY));
-    }
-
-    private boolean isError(final Response<ByteString> response) {
-        return response.status().code() != Status.OK.code() || !response.payload().isPresent();
     }
 }
