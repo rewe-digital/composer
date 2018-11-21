@@ -6,7 +6,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
 import com.rewedigital.composer.composing.ComposerFactory;
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.RequestContext;
@@ -22,9 +22,9 @@ import okio.ByteString;
 public class TemplateRoute implements RouteType {
 
     private final ComposerFactory composerFactory;
-    private final ExtensionAwareRequestClient templateClient;
+    private final CompositionAwareRequestClient templateClient;
 
-    public TemplateRoute(final ExtensionAwareRequestClient templateClient, final ComposerFactory composerFactory) {
+    public TemplateRoute(final CompositionAwareRequestClient templateClient, final ComposerFactory composerFactory) {
         this.templateClient = Objects.requireNonNull(templateClient);
         this.composerFactory = Objects.requireNonNull(composerFactory);
     }
@@ -40,7 +40,7 @@ public class TemplateRoute implements RouteType {
     }
 
     private CompletionStage<Response<ByteString>> process(final Client client,
-            final Map<String, Object> pathArguments, final ComposedResponse<ByteString> templateResponse,
+            final Map<String, Object> pathArguments, final ComposingResponse<ByteString> templateResponse,
             final String path) {
         final Response<ByteString> response = templateResponse.response();
 

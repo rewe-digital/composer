@@ -10,7 +10,7 @@ import com.rewedigital.composer.html.ComposableBodyRoot;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
-import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
+import com.rewedigital.composer.routing.CompositionAwareRequestClient;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.rewedigital.composer.session.CookieBasedSessionHandler;
 import com.rewedigital.composer.session.SessionHandler;
@@ -45,7 +45,7 @@ public class RequestHandlerFactory {
 
         final BackendRouting routing = new BackendRouting(routingConfig);
         final ComposerFactory composerFactory = new ComposerFactory(htmlConfig);
-        final ExtensionAwareRequestClient templateClient = new ExtensionAwareRequestClient();
+        final CompositionAwareRequestClient templateClient = new CompositionAwareRequestClient();
         final RouteTypes routeTypes = new RouteTypes(composerFactory, templateClient);
 
         final SessionHandler sessionHandler = CookieBasedSessionHandler.create(sessionConfig);

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.CompositionStep;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.response.ResponseCompositionFragment;
@@ -23,10 +23,11 @@ public class Composer implements IncludedFragment.Composer, TemplateComposer {
     }
 
     @Override
-    public CompletableFuture<ComposedResponse<String>> composeTemplate(final Response<String> templateResponse, final String path) {
+    public CompletableFuture<ComposingResponse<String>> composeTemplate(final Response<String> templateResponse,
+            final String path) {
         return compose(templateResponse, CompositionStep.root(path))
                 .thenApply(fragment -> responseComposition.composedWith(fragment))
-                .thenApply(composition -> new ComposedResponse<>(templateResponse, composition))
+                .thenApply(composition -> new ComposingResponse<>(templateResponse, composition))
                 .thenApply(r -> r.transform(s -> s.withHeader("Cache-Control", "no-store,max-age=0")));
     }
 

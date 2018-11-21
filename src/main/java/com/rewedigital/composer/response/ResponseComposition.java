@@ -12,8 +12,8 @@ import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
 
 /**
- * Extension of a {@link ComposedResponse}. Holds multiple
- * {@link ComposableRoot}s that form the base of the extensions. Creates
+ * Composition part of a {@link ComposingResponse}. Holds multiple
+ * {@link ComposableRoot}s that form the base of the composition. Creates
  * {@link ResponseCompositionFragment}s based on the contained roots.
  *
  */
@@ -68,6 +68,5 @@ public class ResponseComposition implements RequestEnricher {
 
     public <P> Response<P> writeTo(final Response<P> response) {
         return roots.values().stream().reduce(response, (resp, root) -> root.writtenTo(resp), throwingCombiner());
-
     }
 }

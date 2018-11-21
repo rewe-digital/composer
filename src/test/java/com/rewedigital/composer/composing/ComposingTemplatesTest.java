@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import com.rewedigital.composer.helper.ARequest;
 import com.rewedigital.composer.html.ComposableBodyRoot;
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
@@ -206,7 +206,7 @@ public class ComposingTemplatesTest {
     private void when_composing_a_template(final Response<String> template) throws Exception {
         client = makeClient();
         newComposer = makeNewComposer(client);
-        final ComposedResponse<String> result = newComposer.composeTemplate(template, "template-path").get();
+        final ComposingResponse<String> result = newComposer.composeTemplate(template, "template-path").get();
         response = result.composedResponse();
         session = result.composition().get(SessionRoot.class).get();
     }

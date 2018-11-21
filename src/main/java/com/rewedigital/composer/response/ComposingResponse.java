@@ -9,14 +9,19 @@ import com.spotify.apollo.Response;
  * Holds a response with payload of type <code>T</code> and extending data via
  * an {@link ResponseComposition}.
  */
-public class ComposedResponse<T> {
+public class ComposingResponse<T> {
 
     private final Response<T> response;
     private final ResponseComposition composition;
 
-    public ComposedResponse(final Response<T> response, final ResponseComposition extension) {
+    public static <T> ComposingResponse<T> composedFrom(final Response<T> response,
+            final ResponseComposition composition, final String path) {
+        return new ComposingResponse<>(response, composition.composedWithFragmentFor(response, path));
+    }
+
+    public ComposingResponse(final Response<T> response, final ResponseComposition composition) {
         this.response = Objects.requireNonNull(response);
-        this.composition = Objects.requireNonNull(extension);
+        this.composition = Objects.requireNonNull(composition);
     }
 
     // FIXME confusing when to use this vs composed response?
@@ -28,8 +33,8 @@ public class ComposedResponse<T> {
         return composition;
     }
 
-    public <S> ComposedResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
-        return new ComposedResponse<S>(transformation.apply(response), composition);
+    public <S> ComposingResponse<S> transform(final Function<Response<T>, Response<S>> transformation) {
+        return new ComposingResponse<S>(transformation.apply(response), composition);
     }
 
     public Response<T> composedResponse() {

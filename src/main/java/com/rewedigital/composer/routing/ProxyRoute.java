@@ -15,9 +15,9 @@ import okio.ByteString;
  */
 public class ProxyRoute implements RouteType {
 
-    private final ExtensionAwareRequestClient templateClient;
+    private final CompositionAwareRequestClient templateClient;
 
-    public ProxyRoute(final ExtensionAwareRequestClient templateClient) {
+    public ProxyRoute(final CompositionAwareRequestClient templateClient) {
         this.templateClient = Objects.requireNonNull(templateClient);
     }
 

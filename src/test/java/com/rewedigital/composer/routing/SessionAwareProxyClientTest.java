@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.junit.Test;
 
 import com.rewedigital.composer.helper.Sessions;
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
@@ -33,8 +33,8 @@ public class SessionAwareProxyClientTest {
             Response.ok().withPayload(ByteString.EMPTY).withHeader("x-rd-response-key", "other-value");
 
         final RequestContext context = contextWith(aClient(expectedRequest, response), method);
-        final ComposedResponse<ByteString> templateResponse =
-            new ExtensionAwareRequestClient().fetch(aRouteMatch(), context, session("x-rd-key", "value"))
+        final ComposingResponse<ByteString> templateResponse =
+            new CompositionAwareRequestClient().fetch(aRouteMatch(), context, session("x-rd-key", "value"))
                 .toCompletableFuture()
                 .get();
 

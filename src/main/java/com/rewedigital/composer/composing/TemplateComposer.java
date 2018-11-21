@@ -2,7 +2,7 @@ package com.rewedigital.composer.composing;
 
 import java.util.concurrent.CompletableFuture;
 
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.spotify.apollo.Response;
 
 /**
@@ -12,8 +12,6 @@ import com.spotify.apollo.Response;
  */
 public interface TemplateComposer {
 
-    // FIXME change param to composed response
-    CompletableFuture<ComposedResponse<String>> composeTemplate(Response<String> templateResponse,
+    CompletableFuture<ComposingResponse<String>> composeTemplate(Response<String> templateResponse,
         String templatePath);
-
 }

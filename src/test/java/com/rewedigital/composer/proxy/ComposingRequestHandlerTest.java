@@ -18,11 +18,11 @@ import org.junit.Test;
 import com.rewedigital.composer.application.RequestHandler;
 import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.configuration.DefaultConfiguration;
-import com.rewedigital.composer.response.ComposedResponse;
+import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
-import com.rewedigital.composer.routing.ExtensionAwareRequestClient;
+import com.rewedigital.composer.routing.CompositionAwareRequestClient;
 import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteMatch;
 import com.rewedigital.composer.routing.RouteTypeName;
@@ -104,15 +104,15 @@ public class ComposingRequestHandlerTest {
 
     }
 
-    private static class RoutingResult extends ExtensionAwareRequestClient {
+    private static class RoutingResult extends CompositionAwareRequestClient {
 
         public static RouteTypes returning(final Status status, final String responseBody) {
-            return new RouteTypes(composerFactory(), new ExtensionAwareRequestClient() {
+            return new RouteTypes(composerFactory(), new CompositionAwareRequestClient() {
                 @Override
-                public CompletionStage<ComposedResponse<ByteString>> fetch(final RouteMatch rm,
+                public CompletionStage<ComposingResponse<ByteString>> fetch(final RouteMatch rm,
                     final RequestContext context, final ResponseComposition extension) {
                     return CompletableFuture.completedFuture(
-                        new ComposedResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
+                        new ComposingResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)), extension));
                 }
             });
         }
