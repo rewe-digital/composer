@@ -1,6 +1,6 @@
 package com.rewedigital.composer;
 
-import static com.rewedigital.composer.configuration.DefaultConfiguration.withDefaults;
+import static com.rewedigital.composer.application.DefaultConfiguration.withDefaults;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.rewedigital.composer.configuration;
+package com.rewedigital.composer.application;
 
 import java.util.Collections;
 import java.util.HashMap;

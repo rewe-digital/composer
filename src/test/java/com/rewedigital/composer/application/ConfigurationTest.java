@@ -1,10 +1,10 @@
-package com.rewedigital.composer.configuration;
+package com.rewedigital.composer.application;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
 

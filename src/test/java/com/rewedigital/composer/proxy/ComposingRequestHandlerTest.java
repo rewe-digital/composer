@@ -15,9 +15,9 @@ import java.util.concurrent.CompletionStage;
 
 import org.junit.Test;
 
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.rewedigital.composer.application.RequestHandler;
 import com.rewedigital.composer.composing.ComposerFactory;
-import com.rewedigital.composer.configuration.DefaultConfiguration;
 import com.rewedigital.composer.response.ComposingResponse;
 import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.response.ResponseCompositionHandler;

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.configuration.DefaultConfiguration;
+import com.rewedigital.composer.application.DefaultConfiguration;
 import com.rewedigital.composer.routing.Match;
 import com.rewedigital.composer.routing.RouteTypeName;
 import com.rewedigital.composer.routing.RoutingConfiguration;
