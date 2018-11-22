@@ -22,10 +22,9 @@ import org.assertj.core.api.Condition;
 import org.hamcrest.Matcher;
 import org.junit.Test;
 
+import com.rewedigital.composer.application.ValidatingContentFetcher;
 import com.rewedigital.composer.helper.ARequest;
 import com.rewedigital.composer.html.ComposableBodyRoot;
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
@@ -230,7 +229,7 @@ public class ComposingTemplatesTest {
                 "data-rd-options", maxRecursionDepth);
         final ResponseComposition responseComposition = ResponseComposition
                 .of(Arrays.asList(ComposableBodyRoot.of(configuration), SessionRoot.empty()));
-        final ComposingResponse<String> composingResponse = new ComposingResponse<>(template, responseComposition);
+        final ComposingResponse<String> composingResponse = ComposingResponse.of(template, responseComposition);
         final ContentFetcher contentFetcher = new ValidatingContentFetcher(client, Collections.emptyMap(),
                 responseComposition,
                 configuration.maxRecursion());

@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.composing.ComposerFactory;
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
+import com.rewedigital.composer.composing.TemplateComposer;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -21,10 +21,11 @@ import okio.ByteString;
  */
 public class TemplateRoute implements RouteType {
 
-    private final ComposerFactory composerFactory;
+    private final TemplateComposer.Factory composerFactory;
     private final CompositionAwareRequestClient templateClient;
 
-    public TemplateRoute(final CompositionAwareRequestClient templateClient, final ComposerFactory composerFactory) {
+    public TemplateRoute(final CompositionAwareRequestClient templateClient,
+            final TemplateComposer.Factory composerFactory) {
         this.templateClient = Objects.requireNonNull(templateClient);
         this.composerFactory = Objects.requireNonNull(composerFactory);
     }

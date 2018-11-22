@@ -4,6 +4,6 @@ import java.util.List;
 
 public interface FragmentSource {
 
-    public List<IncludedFragment> includedFragments();
+    public List<? extends IncludedFragment> includedFragments();
 
 }

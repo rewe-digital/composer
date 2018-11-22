@@ -5,6 +5,9 @@ import com.google.inject.Provider;
 import com.spotify.apollo.environment.ClientDecorator;
 import com.spotify.apollo.environment.IncomingRequestAwareClient;
 
+/**
+ * Decorator to enable caching for http responses.
+ */
 public class CachingClientDecorator implements ClientDecorator {
 
     private final Provider<HttpCache> cache;

@@ -10,9 +10,9 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.Test;
 
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
 import com.rewedigital.composer.helper.Sessions;
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.ResponseComposition;
 import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;

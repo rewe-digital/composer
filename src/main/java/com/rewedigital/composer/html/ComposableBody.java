@@ -7,11 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.rewedigital.composer.composing.ContentRange;
+import com.rewedigital.composer.composing.Composable;
+import com.rewedigital.composer.composing.CompositionStep;
 import com.rewedigital.composer.composing.FragmentSource;
 import com.rewedigital.composer.composing.IncludedFragment;
-import com.rewedigital.composer.response.Composable;
-import com.rewedigital.composer.response.CompositionStep;
 
 class ComposableBody implements Composable<ComposableBody>, FragmentSource {
 
@@ -22,7 +21,7 @@ class ComposableBody implements Composable<ComposableBody>, FragmentSource {
     private final List<Asset> assets;
     private final String template;
     private final ContentRange contentRange;
-    private final List<IncludedFragment> includedFragments;
+    private final List<HttpFragment> includedFragments;
     private final List<ComposableBody> children;
 
     public static ComposableBody empty() {
@@ -30,13 +29,13 @@ class ComposableBody implements Composable<ComposableBody>, FragmentSource {
     }
 
     public static ComposableBody of(final CompositionStep step, final String template,
-            final ContentRange contentRange, final List<IncludedFragment> includedFragments, final List<Asset> assets) {
+            final ContentRange contentRange, final List<HttpFragment> includedFragments, final List<Asset> assets) {
         return new ComposableBody(step, template, contentRange, includedFragments, assets,
                 Collections.emptyList());
     }
 
     private ComposableBody(final CompositionStep step, final String template, final ContentRange contentRange,
-            final List<IncludedFragment> includedFragments, final List<Asset> assets,
+            final List<HttpFragment> includedFragments, final List<Asset> assets,
             final List<ComposableBody> children) {
         this.includedFragments = includedFragments.stream().filter(f -> f.isInRage(contentRange))
                 .collect(Collectors.toList());
@@ -55,7 +54,7 @@ class ComposableBody implements Composable<ComposableBody>, FragmentSource {
     }
 
     @Override
-    public List<IncludedFragment> includedFragments() {
+    public List<? extends IncludedFragment> includedFragments() {
         return includedFragments;
     }
 

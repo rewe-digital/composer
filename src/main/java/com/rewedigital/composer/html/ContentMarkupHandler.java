@@ -8,7 +8,6 @@ import org.attoparser.ParseException;
 import org.attoparser.util.TextUtil;
 
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
-import com.rewedigital.composer.composing.ContentRange;
 
 class ContentMarkupHandler extends AbstractMarkupHandler {
 

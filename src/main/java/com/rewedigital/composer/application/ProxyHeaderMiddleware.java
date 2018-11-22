@@ -13,6 +13,10 @@ import com.spotify.apollo.Response;
 import com.spotify.apollo.request.RequestContexts;
 import com.spotify.apollo.route.AsyncHandler;
 
+/**
+ * Apollo middleware that handles hop-by-hop header according to the http
+ * specification.
+ */
 public class ProxyHeaderMiddleware {
 
     public static final Collection<String> hopByHopHeaders =

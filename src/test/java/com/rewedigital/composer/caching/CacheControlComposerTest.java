@@ -1,4 +1,4 @@
-package com.rewedigital.composer.composing;
+package com.rewedigital.composer.caching;
 
 
 import static org.assertj.core.api.Assertions.assertThat;

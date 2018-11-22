@@ -1,16 +1,19 @@
-package com.rewedigital.composer.composing;
+package com.rewedigital.composer.application;
 
 import static java.util.Objects.requireNonNull;
 
+import java.time.Duration;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.damnhandy.uri.template.UriTemplate;
-import com.rewedigital.composer.response.CompositionStep;
-import com.rewedigital.composer.response.RequestEnricher;
+import com.rewedigital.composer.composing.CompositionStep;
+import com.rewedigital.composer.composing.ContentFetcher;
+import com.rewedigital.composer.composing.RequestEnricher;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.Response;
@@ -36,29 +39,30 @@ public class ValidatingContentFetcher implements ContentFetcher {
     }
 
     @Override
-    public CompletableFuture<Response<String>> fetch(final FetchContext context, final CompositionStep step) {
+    public CompletableFuture<Response<String>> fetch(final String path, final String fallback,
+            final Optional<Duration> ttl, final CompositionStep step) {
         if (maxRecursion < step.depth()) {
             LOGGER.warn("Max recursion depth exceeded for " + step.callStack());
-            return CompletableFuture.completedFuture(Response.forPayload(context.fallback()));
+            return CompletableFuture.completedFuture(Response.forPayload(fallback));
         }
 
-        if (context.hasEmptyPath()) {
+        if (isEmpty(path)) {
             LOGGER.warn("Empty path attribute in include found - callstack: " + step.callStack());
             return CompletableFuture.completedFuture(Response.forPayload(""));
         }
 
-        final String expandedPath = UriTemplate.fromTemplate(context.path()).expand(parsedPathArguments);
-        final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), context));
+        final String expandedPath = UriTemplate.fromTemplate(path).expand(parsedPathArguments);
+        final Request request = requestEnricher.enrich(withTtl(Request.forUri(expandedPath, "GET"), ttl));
 
         return client.send(request)
-            .thenApply(response -> acceptHtmlOnly(response, expandedPath))
-            .thenApply(response -> acceptOkStatusOnly(response, expandedPath))
-            .thenApply(r -> toStringPayload(r, context.fallback()))
-            .toCompletableFuture();
+                .thenApply(response -> acceptHtmlOnly(response, expandedPath))
+                .thenApply(response -> acceptOkStatusOnly(response, expandedPath))
+                .thenApply(r -> toStringPayload(r, fallback))
+                .toCompletableFuture();
     }
 
-    private Request withTtl(final Request request, final FetchContext context) {
-        return context.ttl().map(t -> request.withTtl(t)).orElse(request);
+    private Request withTtl(final Request request, final Optional<Duration> ttl) {
+        return ttl.map(t -> request.withTtl(t)).orElse(request);
     }
 
     private Response<String> toStringPayload(final Response<ByteString> response, final String fallback) {
@@ -80,5 +84,9 @@ public class ValidatingContentFetcher implements ContentFetcher {
             return response;
         }
         return response.withPayload(null);
+    }
+
+    private static boolean isEmpty(final String string) {
+        return string == null || string.trim().isEmpty();
     }
 }

@@ -1,12 +1,10 @@
-package com.rewedigital.composer.response;
-
-import java.util.Optional;
+package com.rewedigital.composer.composing;
 
 import com.spotify.apollo.Response;
 
 /**
  * The root of a a group of {@link Composable}s. Individual {@link Composable}s
- * can be created using the root as well as merged into a root.
+ * can be created using the root as well as composed into a root.
  *
  * @param <T>
  */
@@ -19,9 +17,10 @@ public interface ComposableRoot<T extends Composable<T>> {
     public Class<T> composableType();
 
     default public ComposableRoot<T> composedFrom(final Composables composables) {
-        final Class<T> composableType = composableType();
-        final Optional<ComposableRoot<T>> map = composables.get(composableType).map(r -> this.composedWith(r));
-        return map.orElse(this);
+        return composables
+                .get(composableType())
+                .map(r -> this.composedWith(r))
+                .orElse(this);
     }
 
     public <P> Response<P> writtenTo(final Response<P> response);

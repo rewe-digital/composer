@@ -2,7 +2,7 @@ package com.rewedigital.composer.routing;
 
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.composing.ResponseComposition;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
 

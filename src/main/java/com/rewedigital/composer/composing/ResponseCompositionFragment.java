@@ -1,4 +1,4 @@
-package com.rewedigital.composer.response;
+package com.rewedigital.composer.composing;
 
 import java.util.LinkedList;
 import java.util.List;

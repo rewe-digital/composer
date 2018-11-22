@@ -15,12 +15,9 @@ import java.util.concurrent.CompletionStage;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.application.DefaultConfiguration;
-import com.rewedigital.composer.application.RequestHandler;
-import com.rewedigital.composer.composing.ComposerFactory;
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.ResponseComposition;
-import com.rewedigital.composer.response.ResponseCompositionHandler;
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
+import com.rewedigital.composer.composing.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.CompositionAwareRequestClient;
 import com.rewedigital.composer.routing.Match;
@@ -109,7 +106,7 @@ public class ComposingRequestHandlerTest {
                 public CompletionStage<ComposingResponse<ByteString>> fetch(final RouteMatch rm,
                         final RequestContext context, final ResponseComposition extension) {
                     return CompletableFuture.completedFuture(
-                            new ComposingResponse<>(Response.of(status, ByteString.encodeUtf8(responseBody)),
+                            ComposingResponse.of(Response.of(status, ByteString.encodeUtf8(responseBody)),
                                     extension));
                 }
             });

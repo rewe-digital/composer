@@ -4,7 +4,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.response.ResponseCompositionHandler;
+import com.rewedigital.composer.composing.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.RouteTypes;
 import com.spotify.apollo.RequestContext;
@@ -13,6 +13,10 @@ import com.spotify.apollo.Status;
 
 import okio.ByteString;
 
+/**
+ * Central request handler that handles all requests by delegating them to the
+ * appropriate route type.
+ */
 public class RequestHandler {
 
     private final BackendRouting routing;

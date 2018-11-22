@@ -6,10 +6,6 @@ import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.CompositionStep;
-import com.rewedigital.composer.response.ResponseCompositionFragment;
-
 public class Composer implements IncludedFragment.Composer, TemplateComposer {
 
     private final ContentFetcher contentFetcher;
@@ -40,7 +36,7 @@ public class Composer implements IncludedFragment.Composer, TemplateComposer {
                         .thenCombine(b, (x, y) -> x.composedWith(y)));
     }
 
-    private Stream<IncludedFragment> includesIn(final ResponseCompositionFragment compositionFragment) {
+    private Stream<? extends IncludedFragment> includesIn(final ResponseCompositionFragment compositionFragment) {
         return compositionFragment
                 .get(FragmentSource.class)
                 .map(fragmentSource -> fragmentSource.includedFragments())

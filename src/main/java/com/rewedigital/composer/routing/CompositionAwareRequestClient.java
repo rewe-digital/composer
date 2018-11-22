@@ -4,8 +4,8 @@ import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.response.ComposingResponse;
-import com.rewedigital.composer.response.ResponseComposition;
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
 

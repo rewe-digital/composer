@@ -1,4 +1,4 @@
-package com.rewedigital.composer.response;
+package com.rewedigital.composer.composing;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -23,7 +23,11 @@ public class ComposingResponse<T> {
         return new ComposingResponse<>(response, composition).composedWith(fragment);
     }
 
-    public ComposingResponse(final Response<T> response, final ResponseComposition composition) {
+    public static <T> ComposingResponse<T> of(final Response<T> response, final ResponseComposition composition) {
+        return new ComposingResponse<>(response, composition);
+    }
+
+    private ComposingResponse(final Response<T> response, final ResponseComposition composition) {
         this.response = Objects.requireNonNull(response);
         this.composition = Objects.requireNonNull(composition);
     }

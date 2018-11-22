@@ -1,4 +1,4 @@
-package com.rewedigital.composer.response;
+package com.rewedigital.composer.composing;
 
 import static com.rewedigital.composer.util.Combiners.throwingCombiner;
 import static java.util.stream.Collectors.toList;
@@ -57,11 +57,13 @@ public class ResponseComposition implements RequestEnricher {
 
     @Override
     public Request enrich(final Request request) {
-        return roots.values().stream().filter(RequestEnricher.class::isInstance).reduce(request,
-                (req, root) -> ((RequestEnricher) root).enrich(req), throwingCombiner());
+        return roots.values().stream()
+                .filter(RequestEnricher.class::isInstance)
+                .reduce(request, (req, root) -> ((RequestEnricher) root).enrich(req), throwingCombiner());
     }
 
     <P> Response<P> writeTo(final Response<P> response) {
-        return roots.values().stream().reduce(response, (resp, root) -> root.writtenTo(resp), throwingCombiner());
+        return roots.values().stream()
+                .reduce(response, (resp, root) -> root.writtenTo(resp), throwingCombiner());
     }
 }

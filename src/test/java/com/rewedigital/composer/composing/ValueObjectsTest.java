@@ -2,12 +2,9 @@ package com.rewedigital.composer.composing;
 
 import static com.rewedigital.composer.helper.ValueObjectAssertions.assertIsValueObject;
 
-import java.time.Duration;
-import java.util.Optional;
-
 import org.junit.Test;
 
-import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.html.ContentRange;
 
 public class ValueObjectsTest {
 
@@ -18,17 +15,6 @@ public class ValueObjectsTest {
         final ContentRange third = new ContentRange(10, 20);
         final ContentRange forth = new ContentRange(5, 10);
         final ContentRange fifth = new ContentRange(0, 20);
-
-        assertIsValueObject(first, second, third, forth, fifth);
-    }
-
-    @Test
-    public void fetchContext_is_value_object() {
-        final FetchContext first = FetchContext.of("/", "/fallback", Optional.empty());
-        final FetchContext second = FetchContext.of("/", "/fallback", Optional.empty());
-        final FetchContext third = FetchContext.of("/test", "/fallback", Optional.empty());
-        final FetchContext forth = FetchContext.of("/", "/other", Optional.empty());
-        final FetchContext fifth = FetchContext.of("/", "/fallback", Optional.of(Duration.ofMillis(1000)));
 
         assertIsValueObject(first, second, third, forth, fifth);
     }

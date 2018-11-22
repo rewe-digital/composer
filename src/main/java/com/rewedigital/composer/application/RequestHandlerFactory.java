@@ -4,11 +4,10 @@ import static java.util.Arrays.asList;
 
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.composing.ComposerFactory;
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
+import com.rewedigital.composer.composing.ResponseComposition;
+import com.rewedigital.composer.composing.ResponseCompositionHandler;
 import com.rewedigital.composer.html.ComposableBodyRoot;
-import com.rewedigital.composer.response.ResponseComposition;
-import com.rewedigital.composer.response.ResponseCompositionHandler;
 import com.rewedigital.composer.routing.BackendRouting;
 import com.rewedigital.composer.routing.CompositionAwareRequestClient;
 import com.rewedigital.composer.routing.RouteTypes;
@@ -17,6 +16,10 @@ import com.rewedigital.composer.session.SessionHandler;
 import com.spotify.apollo.RequestContext;
 import com.typesafe.config.Config;
 
+/**
+ * Constructs an instance of the {@link RequestHandler} and all of it's
+ * dependencies.
+ */
 public class RequestHandlerFactory {
 
     private static class CompositionHandler implements ResponseCompositionHandler {

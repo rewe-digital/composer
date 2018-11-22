@@ -8,10 +8,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.rewedigital.composer.composing.ComposableRoot;
 import com.rewedigital.composer.composing.ComposerHtmlConfiguration;
-import com.rewedigital.composer.composing.ContentRange;
-import com.rewedigital.composer.response.ComposableRoot;
-import com.rewedigital.composer.response.CompositionStep;
+import com.rewedigital.composer.composing.CompositionStep;
 import com.spotify.apollo.Response;
 
 public class ComposableBodyRoot implements ComposableRoot<ComposableBody> {
@@ -68,7 +67,7 @@ public class ComposableBodyRoot implements ComposableRoot<ComposableBody> {
     public <P> Response<P> writtenTo(final Response<P> response) {
         return response.payload()
                 .filter(String.class::isInstance)
-                .map(r -> response.withPayload(withAssetLinks(body())))
+                .map(p -> response.withPayload(withAssetLinks(body())))
                 .map(r -> (Response<P>) r)
                 .orElse(response);
     }
@@ -78,12 +77,16 @@ public class ComposableBodyRoot implements ComposableRoot<ComposableBody> {
     }
 
     private String withAssetLinks(final String body) {
-        final String renderedAssets = allAssets().distinct().map(Asset::render).collect(Collectors.joining("\n"));
+        final String renderedAssets = allAssets()
+                .distinct()
+                .map(Asset::render)
+                .collect(Collectors.joining("\n"));
         return body.replaceFirst("</head>", renderedAssets + "\n</head>");
     }
 
     private Stream<Asset> allAssets() {
-        return children.stream().flatMap(c -> c.allAssets());
+        return children.stream()
+                .flatMap(c -> c.allAssets());
     }
 
     private static Optional<String> bodyOf(final Response<?> response) {
