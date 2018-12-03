@@ -1,5 +1,6 @@
 package com.rewedigital.composer.routing;
 
+import static java.util.Arrays.asList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -9,8 +10,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.junit.Test;
 
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
 import com.rewedigital.composer.helper.Sessions;
-import com.rewedigital.composer.session.ResponseWithSession;
+import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.RequestContext;
@@ -30,13 +33,14 @@ public class SessionAwareProxyClientTest {
             Response.ok().withPayload(ByteString.EMPTY).withHeader("x-rd-response-key", "other-value");
 
         final RequestContext context = contextWith(aClient(expectedRequest, response), method);
-        final ResponseWithSession<ByteString> templateResponse =
-            new SessionAwareProxyClient().fetch(aRouteMatch(), context, Sessions.sessionRoot("x-rd-key", "value"))
+        final ComposingResponse<ByteString> templateResponse =
+            new CompositionAwareRequestClient().fetch(aRouteMatch(), context, session("x-rd-key", "value"))
                 .toCompletableFuture()
                 .get();
 
-        assertThat(templateResponse.session().get("key")).contains("value");
-        assertThat(templateResponse.session().get("response-key")).contains("other-value");
+        final SessionRoot sessionRoot = templateResponse.getComposition(SessionRoot.class).get();
+        assertThat(sessionRoot.get("key")).contains("value");
+        assertThat(sessionRoot.get("response-key")).contains("other-value");
     }
 
     private RouteMatch aRouteMatch() {
@@ -57,5 +61,9 @@ public class SessionAwareProxyClientTest {
         final Client client = mock(Client.class);
         when(client.send(request)).thenReturn(CompletableFuture.completedFuture(response));
         return client;
+    }
+
+    private ResponseComposition session(final String key, final String value) {
+        return ResponseComposition.of(asList(Sessions.sessionRoot(key, value)));
     }
 }

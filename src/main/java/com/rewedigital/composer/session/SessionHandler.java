@@ -68,10 +68,6 @@ public abstract class SessionHandler implements SessionRoot.Serializer {
         return runInterceptors(session, context);
     }
 
-    public <T> Response<T> store(final ResponseWithSession<T> response) {
-        return response.writeSessionToResponse(this);
-    }
-
     protected abstract SessionRoot obtainSession(Request request);
 
 

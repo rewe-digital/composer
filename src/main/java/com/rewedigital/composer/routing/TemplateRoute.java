@@ -1,16 +1,13 @@
 package com.rewedigital.composer.routing;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
-import com.rewedigital.composer.composing.ComposerFactory;
-import com.rewedigital.composer.session.ResponseWithSession;
-import com.rewedigital.composer.session.SessionRoot;
+import com.rewedigital.composer.composing.ComposingResponse;
+import com.rewedigital.composer.composing.ResponseComposition;
+import com.rewedigital.composer.composing.TemplateComposer;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -19,55 +16,46 @@ import com.spotify.apollo.Status;
 import okio.ByteString;
 
 /**
- * {@link RouteType} <em>template</em> executes composition logic on the response of the route target.
+ * {@link RouteType} <em>template</em> executes composition logic on the
+ * response of the route target.
  */
 public class TemplateRoute implements RouteType {
 
-    private final ComposerFactory composerFactory;
-    private final SessionAwareProxyClient templateClient;
+    private final TemplateComposer.Factory composerFactory;
+    private final CompositionAwareRequestClient templateClient;
 
-    public TemplateRoute(final SessionAwareProxyClient templateClient, final ComposerFactory composerFactory) {
+    public TemplateRoute(final CompositionAwareRequestClient templateClient,
+            final TemplateComposer.Factory composerFactory) {
         this.templateClient = Objects.requireNonNull(templateClient);
         this.composerFactory = Objects.requireNonNull(composerFactory);
     }
 
     @Override
-    public CompletionStage<ResponseWithSession<ByteString>> execute(final RouteMatch rm, final RequestContext context,
-        final SessionRoot session) {
-        return templateClient.fetch(rm, context, session)
-            .thenCompose(
-                templateResponse -> process(context.requestScopedClient(), rm.parsedPathArguments(), templateResponse,
-                    rm.expandedPath()));
+    public CompletionStage<Response<ByteString>> execute(final RouteMatch rm, final RequestContext context,
+            final ResponseComposition extensions) {
+        return templateClient.fetch(rm, context, extensions)
+                .thenCompose(
+                        templateResponse -> process(context.requestScopedClient(), rm.parsedPathArguments(),
+                                templateResponse, rm.expandedPath()));
     }
 
-    private CompletionStage<ResponseWithSession<ByteString>> process(final Client client,
-        final Map<String, Object> pathArguments, final ResponseWithSession<ByteString> responseWithSession,
-        final String path) {
-        final Response<ByteString> response = responseWithSession.response();
+    private CompletionStage<Response<ByteString>> process(final Client client,
+            final Map<String, Object> pathArguments, final ComposingResponse<ByteString> templateResponse,
+            final String path) {
 
-        if (isError(response)) {
-            return CompletableFuture
-                .completedFuture(responseWithSession.transform(
-                    r -> Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"))));
-        }
-
-        return composerFactory
-            .build(client, pathArguments, responseWithSession.session())
-            .composeTemplate(response.withPayload(response.payload().get().utf8()), path)
-            .thenApply(r -> r.transform(this::toByteString))
-            .thenApply(r -> r.transform(p -> p.withHeaders(contentTypeOf(response))));
+        return templateResponse.toComposablePayload()
+                .map(template -> composerFactory.build(client, path, pathArguments, template)
+                        .composeTemplate()
+                        .thenApply(r -> r.composedResponse())
+                        // TODO compose cache-control header
+                        .thenApply(r -> r.withHeader("Cache-Control", "no-store,max-age=0"))
+                        .thenApply(this::toByteStringPayload))
+                .orElseGet(() -> CompletableFuture.completedFuture(
+                        // TODO proper error handling
+                        Response.of(Status.INTERNAL_SERVER_ERROR, ByteString.encodeUtf8("Ohh.. noose!"))));
     }
 
-    private Response<ByteString> toByteString(final Response<String> response) {
+    private Response<ByteString> toByteStringPayload(final Response<String> response) {
         return response.withPayload(response.payload().map(ByteString::encodeUtf8).orElse(ByteString.EMPTY));
-    }
-
-    private Map<String, String> contentTypeOf(final Response<ByteString> response) {
-        return response.headerEntries().stream().filter(h -> "content-type".equalsIgnoreCase(h.getKey()))
-            .collect(toMap(Entry::getKey, Entry::getValue, (a, b) -> a));
-    }
-
-    private boolean isError(final Response<ByteString> response) {
-        return response.status().code() != Status.OK.code() || !response.payload().isPresent();
     }
 }

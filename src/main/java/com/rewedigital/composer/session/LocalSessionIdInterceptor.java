@@ -55,7 +55,7 @@ public class LocalSessionIdInterceptor implements SessionHandler.Interceptor {
         final long newExpiresAt = expiration(expiresAt, context);
         data.put("expires-at", Long.toString(newExpiresAt));
         final boolean dirty = expiresAt.map(e -> e != newExpiresAt).orElse(true);
-        return SessionRoot.of(data, dirty);
+        return SessionRoot.of(session.serializer(), data, dirty);
     }
 
     private boolean isExpired(final Optional<Long> expiresAt, final RequestContext context) {

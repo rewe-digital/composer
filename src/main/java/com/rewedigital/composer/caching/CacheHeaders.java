@@ -10,6 +10,9 @@ import com.spotify.ffwd.http.okhttp3.Headers;
 
 import okio.ByteString;
 
+/**
+ * Factory methods to create {@link CacheControl} instances.
+ */
 public class CacheHeaders {
 
     public static CacheControl of(final Response<ByteString> response) {

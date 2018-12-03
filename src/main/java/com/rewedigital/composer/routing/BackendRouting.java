@@ -7,7 +7,6 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.rewedigital.composer.session.SessionRoot;
 import com.spotify.apollo.Request;
 import com.spotify.apollo.route.InvalidUriException;
 import com.spotify.apollo.route.Rule;
@@ -32,7 +31,7 @@ public class BackendRouting {
         this(RoutingConfiguration.fromConfig(config).localRules());
     }
 
-    public Optional<RouteMatch> matches(final Request incommingRequest, final SessionRoot session) {
+    public Optional<RouteMatch> matches(final Request incommingRequest) {
         try {
             return findMatch(incommingRequest)
                 .map(m -> new RouteMatch(m.getRule().getTarget(), m.parsedPathArguments()));

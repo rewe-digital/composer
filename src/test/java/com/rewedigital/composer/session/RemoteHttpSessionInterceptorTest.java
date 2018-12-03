@@ -11,7 +11,7 @@ import java.util.concurrent.CompletionStage;
 
 import org.junit.Test;
 
-import com.rewedigital.composer.helper.RequestMatching;
+import com.rewedigital.composer.helper.ARequest;
 import com.spotify.apollo.Client;
 import com.spotify.apollo.RequestContext;
 import com.spotify.apollo.Response;
@@ -30,7 +30,7 @@ public class RemoteHttpSessionInterceptorTest {
             new RemoteHttpSessionInterceptor(config().withValue("url", ConfigValueFactory.fromAnyRef(url)));
 
         final Client client = mock(Client.class);
-        when(client.send(argThat(RequestMatching.with("POST", url, "{\"x-rd-key\":\"value\"}"))))
+        when(client.send(argThat(ARequest.with("POST", url, "{\"x-rd-key\":\"value\"}"))))
             .thenReturn(response("{\"x-rd-key\":\"new-value\"}"));
 
         final SessionRoot session =
