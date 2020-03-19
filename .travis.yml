@@ -5,5 +5,14 @@ language: java
 jdk:
  - openjdk11
 
+addons:
+  sonarcloud:
+    organization: "rewe-digital-incubator"
+    token:
+      secure: "ZgTvVg33LF8T6d6CFqLm/pkf5srBMelBmA1IITUHgnNrwglBS5ilJPrxyP+wfklolFcp96PnDr/LlS2mrbsYhO0eixxycedvCkxb3gH8B+xBjeGEFzVee3QOCmyr4ngTsYV7caqfMOhwxZqlu404zlkDSPGVjzd7q32tOkOI/1DwGg0Su2W0dHubrSdYDvJmDQWXdUTuU1j+q/1ivrBA4TnW1yJOzYoO0X0x6xJjVVaoQG7Fwc4+O0uEKwCxCgCu8YnjaNF0mckI5joZwimbnRX+OjdOvEQ5DfBeOs60fdLGPm00en3AGjWo8qPz7VzXe9CXYcCCpdX9ZgMpyReYxwahZGT/0uLYkywp5I2QSQl1XI74skuH34gT5rz2YAprLIwM8mj7Jq2DmQFVQ7y1L3f9lWIm9f5Bcd9jpO7vEmyeOY5Pgec2EN1IhcAfTpk2JgZw4GMiUoFFccAz2/h30BTsIvfBrxXn9ETMP97SVEUgwtwNBFmiAgnd7I/dNeWQk1rM29yj24cBPbJCyzGcetqDc+l/Fhbbo2jCoEHwhBd1ZYPQ5nDbpyGm6ejC8XIGdBA1xQtpPCQwOpOmnEBexV5poCP7bsybXe2TwK6FqnytdWWXSiMbSv5Y/1Ax4u58vlqC1Kzowxb7d8LwwQFSX+W59jEogibI0gjgJfLexQE="
+ 
+script:
+ - mvn clean verify sonar:sonar
+
 after_success:
   - bash <(curl -s https://codecov.io/bash)
